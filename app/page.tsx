@@ -5,16 +5,16 @@ export default function Home() {
 		<main>
 			<p>
 				parallax effect here
+				//priority={false}
 			</p>
 
 			<div>
 				<Image
 					src = "/../public/pic.jpg"
 					alt = "My photo ig"
-					width={250}
-					height={250}
+					width = "720"
+					height = "900"
 				/>
-
 				<p>
 					Aarav Jain
 				</p>
@@ -22,7 +22,7 @@ export default function Home() {
 					Software Developer
 				</p>
 				<p>
-					
+					A portfolio of my projects, and a project itself.
 				</p>
 			</div>
 		</main>
