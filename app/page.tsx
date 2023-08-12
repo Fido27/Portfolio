@@ -25,10 +25,46 @@ export default function Home() {
 					</p> */}
 					
 					<ul className = "flex">
-						<li>Github</li>
-						<li>Instagram</li>
-						<li>Discord</li>
-						<li>Mail</li>
+						<li>
+							<Image
+							src = "/../public/github.svg"
+							alt = "Github Icon"
+							width = "32"
+							height = "32"
+							/>
+						</li>
+						<li>
+							<Image
+							src = "/../public/linkedin.svg"
+							alt = "Github Icon"
+							width = "32"
+							height = "32"
+							/>
+						</li>
+						<li>
+							<Image
+							src = "/../public/instagram.svg"
+							alt = "Github Icon"
+							width = "32"
+							height = "32"
+							/>
+						</li>
+						<li>
+							<Image
+							src = "/../public/discord.svg"
+							alt = "Github Icon"
+							width = "32"
+							height = "32"
+							/>
+						</li>
+						<li>
+							<Image
+							src = "/../public/email.svg"
+							alt = "Github Icon"
+							width = "32"
+							height = "32"
+							/>
+						</li>
 					</ul>
 				</div>
 
