@@ -1,11 +1,13 @@
 import Image from "next/image"
+import Background from "./bg"
+
 
 export default function Home() {
+
 	return (
 		<main>
-			<p>
-				parallax effect here
-			</p>
+			
+			<Background/>
 
 			<div className = "flex m-40 flex-wrap justify-evenly justify-items-center">
 				<div className = "grid justify-items-center">
@@ -27,42 +29,42 @@ export default function Home() {
 					<ul className = "flex">
 						<li>
 							<Image
-							src = "/../public/github.svg"
-							alt = "Github Icon"
-							width = "32"
-							height = "32"
+								src = "/../public/github.svg"
+								alt = "Github Icon"
+								width = "32"
+								height = "32"
 							/>
 						</li>
 						<li>
 							<Image
-							src = "/../public/linkedin.svg"
-							alt = "Github Icon"
-							width = "32"
-							height = "32"
+								src = "/../public/linkedin.svg"
+								alt = "Github Icon"
+								width = "32"
+								height = "32"
 							/>
 						</li>
 						<li>
 							<Image
-							src = "/../public/instagram.svg"
-							alt = "Github Icon"
-							width = "32"
-							height = "32"
+								src = "/../public/instagram.svg"
+								alt = "Github Icon"
+								width = "32"
+								height = "32"
 							/>
 						</li>
 						<li>
 							<Image
-							src = "/../public/discord.svg"
-							alt = "Github Icon"
-							width = "32"
-							height = "32"
+								src = "/../public/discord.svg"
+								alt = "Github Icon"
+								width = "32"
+								height = "32"
 							/>
 						</li>
 						<li>
 							<Image
-							src = "/../public/email.svg"
-							alt = "Github Icon"
-							width = "32"
-							height = "32"
+								src = "/../public/email.svg"
+								alt = "Github Icon"
+								width = "32"
+								height = "32"
 							/>
 						</li>
 					</ul>
