@@ -38,34 +38,38 @@ export default function Home() {
 						<li>
 							<Image
 								src = "/../public/linkedin.svg"
-								alt = "Github Icon"
+								alt = "LinkedIn Icon"
 								width = "32"
 								height = "32"
 							/>
 						</li>
 						<li>
+							<a href = "https://www.instagram.com/____fido/" target = "_blank">
 							<Image
 								src = "/../public/instagram.svg"
-								alt = "Github Icon"
+								alt = "Instagram Icon"
 								width = "32"
 								height = "32"
 							/>
+							</a>
 						</li>
 						<li>
 							<Image
 								src = "/../public/discord.svg"
-								alt = "Github Icon"
+								alt = "Discord Icon"
 								width = "32"
 								height = "32"
 							/>
 						</li>
 						<li>
+							<a href = "mailto:aaravjain272003@gmail.com" target = "_blank">
 							<Image
 								src = "/../public/email.svg"
-								alt = "Github Icon"
+								alt = "Email Icon"
 								width = "32"
 								height = "32"
 							/>
+							</a>
 						</li>
 					</ul>
 				</div>
