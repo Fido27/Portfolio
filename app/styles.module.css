@@ -1,0 +1,12 @@
+.parallaxs {
+    z-index: -1;
+}
+
+.bgImgDiv {
+    width: 100%;
+    height: 0vh;
+}
+
+.bgImg {
+    object-fit: cover;
+}

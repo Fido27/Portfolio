@@ -1,16 +1,25 @@
 import Image from "next/image"
+import styles from './styles.module.css'
 import Background from "./bg"
-
 
 export default function Home() {
 
 	return (
 		<main>
-			
-			<Background/>
+			<div className={styles.bgImgDiv}>
+				<Image
+					className={styles.bgImg}
+					src = "/../public/Background/bg.jpg"
+					alt = "BG image"
+					fill
+					style={{
+						objectFit: 'cover',
+					  }}
+				/>
+			</div>
 
-			<div className = "flex m-40 flex-wrap justify-evenly justify-items-center">
-				<div className = "grid justify-items-center">
+			<div className = "absolute h-screen w-screen items-center justify-center flex">
+				<div className = "grid w-auto justify-items-center">
 					<Image
 						src = "/../public/pic.jpg"
 						alt = "My photo ig"
