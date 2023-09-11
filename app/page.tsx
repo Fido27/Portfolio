@@ -19,7 +19,7 @@ export default function Home() {
 			</div>
 
 			<div className = "absolute h-screen w-screen items-center justify-center flex">
-				<div className = "grid w-auto justify-items-center">
+				<div className="grid w-1/2 justify-items-center">
 					<Image
 						src = "/../public/pic.jpg"
 						alt = "My photo ig"
@@ -27,7 +27,7 @@ export default function Home() {
 						height = "250"
 					/>
 
-					<p className = "pt-8 text-5xl font-bold">
+					<p className = "p-8 text-center text-6xl font-bold">
 						Aarav Jain
 					</p>
 
@@ -83,9 +83,9 @@ export default function Home() {
 					</ul>
 				</div>
 
-				<div>
-					<p>
-						A portfolio of my projects, and a project itself.
+				<div className="w-1/2 justify-items-center text-center">
+					<p className="p-20 w-5/6 text-4xl">
+						Hi, this is a portfolio of my projects. Feel free to contact me.{/* and dont forget to check out my blog.*/}
 					</p>
 				</div>
 			</div>
