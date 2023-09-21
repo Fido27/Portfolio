@@ -85,7 +85,7 @@ export default function Home() {
 
 				<div className="w-1/2 justify-items-center text-center">
 					<p className="p-20 w-5/6 text-4xl">
-						Hi, this is a portfolio of my projects. Feel free to contact me.{/* and dont forget to check out my blog.*/}
+						Welcome to my first published website. This is the portal to all my projects.{/* and dont forget to check out my blog.*/}
 					</p>
 				</div>
 			</div>
