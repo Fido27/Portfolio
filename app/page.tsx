@@ -96,6 +96,3 @@ export default function Home() {
 		</main>
 	)
 }
-
-
-sudo mount -t cifs -o user=fido //192.168.0.60/Nasty
