@@ -37,20 +37,24 @@ export default function Home() {
 					
 					<ul className = "flex">
 						<li>
+							<a href = "https://github.com/Fido27" target = "_blank">
 							<Image
 								src = "/../public/github.svg"
 								alt = "Github Icon"
 								width = "32"
 								height = "32"
 							/>
+							</a>
 						</li>
 						<li>
+							<a href = "https://www.linkedin.com/in/aaravjain272003/" target = "_blank">
 							<Image
 								src = "/../public/linkedin.svg"
 								alt = "LinkedIn Icon"
 								width = "32"
 								height = "32"
 							/>
+							</a>
 						</li>
 						<li>
 							<a href = "https://www.instagram.com/____fido/" target = "_blank">
@@ -92,3 +96,6 @@ export default function Home() {
 		</main>
 	)
 }
+
+
+sudo mount -t cifs -o user=fido //192.168.0.60/Nasty
