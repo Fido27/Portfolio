@@ -8,7 +8,7 @@ export default function Background() {
         <div className={styles.parallaxs}>
             <MouseParallax enableOnTouchDevice isAbsolutelyPositioned lerpEase={0.02}>
                 <Image
-                    src = "/../public/Background/1.jpg"
+                    src = "../public/Background/1.jpg"
                     alt = "Sample Parallax image"
                     width = "4608"
                     height = "2592"
