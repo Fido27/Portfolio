@@ -9,7 +9,7 @@ export default function Home() {
 			<div className={styles.bgImgDiv}>
 				<Image
 					className={styles.bgImg}
-					src = "/../public/Background/bg.jpg"
+					src = "//Background/bg.jpg"
 					alt = "BG image"
 					fill
 					style={{
@@ -21,7 +21,7 @@ export default function Home() {
 			<div className = "absolute h-screen w-screen items-center justify-center flex">
 				<div className="grid w-1/2 justify-items-center">
 					<Image
-						src = "../public/pic.jpg"
+						src = "/pic.jpg"
 						alt = "My photo ig"
 						width = "200"
 						height = "250"
@@ -39,7 +39,7 @@ export default function Home() {
 						<li>
 							<a href = "https://github.com/Fido27" target = "_blank">
 							<Image
-								src = "../public/github.svg"
+								src = "/github.svg"
 								alt = "Github Icon"
 								width = "32"
 								height = "32"
@@ -49,7 +49,7 @@ export default function Home() {
 						<li>
 							<a href = "https://www.linkedin.com/in/aaravjain272003/" target = "_blank">
 							<Image
-								src = "../public/linkedin.svg"
+								src = "/linkedin.svg"
 								alt = "LinkedIn Icon"
 								width = "32"
 								height = "32"
@@ -59,7 +59,7 @@ export default function Home() {
 						<li>
 							<a href = "https://www.instagram.com/____fido/" target = "_blank">
 							<Image
-								src = "../public/instagram.svg"
+								src = "/instagram.svg"
 								alt = "Instagram Icon"
 								width = "32"
 								height = "32"
@@ -68,7 +68,7 @@ export default function Home() {
 						</li>
 						<li>
 							<Image
-								src = "../public/discord.svg"
+								src = "/discord.svg"
 								alt = "Discord Icon"
 								width = "32"
 								height = "32"
@@ -77,7 +77,7 @@ export default function Home() {
 						<li>
 							<a href = "mailto:aaravjain272003@gmail.com" target = "_blank">
 							<Image
-								src = "../public/email.svg"
+								src = "/email.svg"
 								alt = "Email Icon"
 								width = "32"
 								height = "32"
@@ -96,5 +96,3 @@ export default function Home() {
 		</main>
 	)
 }
-
-@reboot cd /home/fido/Server/Portfolio && git pull && npm run build && npm run start
