@@ -6,7 +6,7 @@ import Image from "next/image"
 export default function Background() {
     return(
         <div className={styles.parallaxs}>
-            <MouseParallax enableOnTouchDevice isAbsolutelyPositioned lerpEase={0.02}>
+            <MouseParallax enableOnTouchDevice isAbsolutelyPositioned lerpEase={0.02} strength={1}>
                 <Image
                     src = "/Background/1.jpg"
                     alt = "Sample Parallax image"

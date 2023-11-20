@@ -9,7 +9,7 @@ export default function Home() {
 			<div className={styles.bgImgDiv}>
 				<Image
 					className={styles.bgImg}
-					src = "//Background/bg.jpg"
+					src = "/Background/bg.jpg"
 					alt = "BG image"
 					fill
 					style={{
@@ -43,6 +43,7 @@ export default function Home() {
 								alt = "Github Icon"
 								width = "32"
 								height = "32"
+								className="mx-1"
 							/>
 							</a>
 						</li>
@@ -53,6 +54,7 @@ export default function Home() {
 								alt = "LinkedIn Icon"
 								width = "32"
 								height = "32"
+								className="mx-1"
 							/>
 							</a>
 						</li>
@@ -61,18 +63,11 @@ export default function Home() {
 							<Image
 								src = "/instagram.svg"
 								alt = "Instagram Icon"
-								width = "32"
-								height = "32"
+								width = "30"
+								height = "30"
+								className="mx-1"
 							/>
 							</a>
-						</li>
-						<li>
-							<Image
-								src = "/discord.svg"
-								alt = "Discord Icon"
-								width = "32"
-								height = "32"
-							/>
 						</li>
 						<li>
 							<a href = "mailto:aaravjain272003@gmail.com" target = "_blank">
@@ -81,6 +76,7 @@ export default function Home() {
 								alt = "Email Icon"
 								width = "32"
 								height = "32"
+								className="mx-1"
 							/>
 							</a>
 						</li>
