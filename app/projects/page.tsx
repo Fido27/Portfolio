@@ -28,9 +28,11 @@ export default function Projects() {
                     objectFit: 'cover',
                     }}
             />
-            <MouseParallax enableOnTouchDevice isAbsolutelyPositioned lerpEase={0.02} strength={0.3}>
+            {/* <MouseParallax enableOnTouchDevice isAbsolutelyPositioned lerpEase={0.02} strength={0.3}>
                 {CardObj(cardsList[0].id , cardsList[0].src , cardsList[0].title , cardsList[0].desc)}
-            </MouseParallax>
+            </MouseParallax> */}
+
+            {CardObj(cardsList[0].id , cardsList[0].src , cardsList[0].title , cardsList[0].desc)}
 
         </main>
     )
