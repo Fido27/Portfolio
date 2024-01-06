@@ -22,7 +22,7 @@ export default function Blogs() {
                 About this Project
             </div>
             <div>
-                Audible Maps provides real-time audio maps and navigation. Its a mobile app that offers customizable navigation routes and markers and can track user’s location and give turn-by-turn audible feedback to the user for better understandings of their surroundings and better guidance to their destination.
+                Audible Maps provides real-time audio maps and navigation. Its a mobile app that offers customizable navigation routes and markers and can track user`&apos;`s location and give turn-by-turn audible feedback to the user for better understandings of their surroundings and better guidance to their destination.
             </div>
             <div className="text-3xl my-2">
                 Business Model
@@ -34,7 +34,7 @@ export default function Blogs() {
                 Progress
             </div>
             <div>
-                Live location tracking, entrances to buildings and waypoint polyline graphs have already been implemented. The app can detect buildings in a radius of 35 feet from the user. The app can tell the walking ETA from user's current location to the destination.
+                Live location tracking, entrances to buildings and waypoint polyline graphs have already been implemented. The app can detect buildings in a radius of 35 feet from the user. The app can tell the walking ETA from user`&apos;`s current location to the destination.
             </div>
         </div>
     );
