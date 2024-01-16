@@ -2,6 +2,8 @@ import Image from "next/image"
 import styles from './styles.module.css'
 import Background from "./bg"
 
+// Testing img mess up
+
 export default function Home() {
 
 	return (
