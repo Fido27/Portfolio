@@ -16,7 +16,7 @@ origins = [
     "http://localhost",
     "http://localhost:8080",
     "http://localhost:3000"
-    "https://fido27.tech/api"
+    "https://fido27.tech"
 ]
 
 @app.get("/")

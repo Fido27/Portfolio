@@ -1,3 +1,4 @@
+'use client'
 import { Button } from "@nextui-org/react";
 
 function handleInput(){
@@ -5,7 +6,7 @@ function handleInput(){
 }
 
 function handleSubmit(){
-    
+
 }
 
 export default function Blogs() {
