@@ -1,6 +1,6 @@
 #!/bin/sh
 
-#git pull
+git pull
 python -m venv venv
 . venv/bin/activate
 pip install -r requirements.txt
