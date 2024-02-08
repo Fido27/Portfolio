@@ -91,4 +91,5 @@ async function sendPacket(formData: FormData) {
     const req = await fetch('http://localhost:8000/imf/?' + params)
     const res = await req.json()
     document.getElementById("profit")!.innerText = res.toString()
+    return false
 }

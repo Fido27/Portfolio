@@ -36,5 +36,5 @@ def logic(date , amount):
     amount = int(amount)
     row_index = df.query('Date == "%s"' % date).index[0]
     cp = df.iloc[row_index]["NIFTY"]
-    sp = df.iloc[7]["NIFTY"]
+    sp = df.iloc[-1]["NIFTY"]
     return json.dumps(sp * amount - cp * amount)
