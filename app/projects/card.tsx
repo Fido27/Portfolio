@@ -16,21 +16,24 @@ export function CardObj(id:string , src:string , title:string , desc:string) {
   
 	return (
         <Link href="/blogs">
-            <Card onMouseEnter = {(e) => {onMouseEnter(id)}} onMouseLeave={(e) => {onMouseLeave(id)}} id = {id} className = "z-20 border-2 border-dashed w-[300px] h-[200px] m-10 rounded-xl">
+            <Card onMouseEnter = {(e) => {onMouseEnter(id)}} onMouseLeave={(e) => {onMouseLeave(id)}} className = "z-20 border-2 border-dashed w-[300px] h-[200px] m-10 rounded-2xl">
                 <Image
-                    className="object-cover relative"
+                    className="object-cover relative w-[300px] h-[196px] rounded-2xl"
+                    id = {id}
                     src={src}
                     alt={title + " Image"}
                     height={0}
                     width={250}
                 />
-                <CardBody className="m-2 bottom-1 absolute">
-                    <p className="z-30 text-white/80 text-2xl">
-                        {title}
-                    </p>
-                    <p>
-                        {desc}
-                    </p>
+                <CardBody className="absolute">
+                    <div className="m-3 mx-4">
+                        <div className="z-30 text-white/80 text-3xl transform transition-all rotate-45 duration-750 delay-150">
+                            {title}
+                        </div>
+                        <div>
+                            {desc}
+                        </div>
+                    </div>
                 </CardBody>
             </Card>
         </Link>

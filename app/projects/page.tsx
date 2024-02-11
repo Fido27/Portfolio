@@ -12,7 +12,7 @@ interface Card {
 }
 
 const cardsList:Card[]=[
-    {id: "placeholder" , src: "/Background/bean.jpg" , title: "evcwx" , desc:"were"}
+    {id: "placeholder" , src: "/Background/bean.jpg" , title: "Title" , desc:"This is the description"}
 ]
 
 export default function Projects() {
