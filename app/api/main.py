@@ -1,4 +1,5 @@
 import json
+import random
 from dotenv import load_dotenv
 from fastapi import FastAPI
 from fastapi.concurrency import asynccontextmanager
@@ -23,7 +24,7 @@ app.add_middleware(
 )
 
 @app.get("/")
-def read_root():
+def root():
     return {"Hello": "World"}
 
 
@@ -32,9 +33,17 @@ def start():
     print(started)
 
 @app.get("/imf/")
-def logic(date , amount):
+def logic(amount):
     amount = int(amount)
-    row_index = df.query('Date == "%s"' % date).index[0]
+    row_index = random.randrange(1, len(df) - 248)
     cp = df.iloc[row_index]["NIFTY"]
-    sp = df.iloc[-1]["NIFTY"]
-    return json.dumps(sp * amount - cp * amount)
+    sp = df.iloc[row_index + 248]["NIFTY"]
+
+    gains = amount * (sp/cp)
+    gains_percent = ((gains - amount) / amount) * 100
+
+    return json.dumps({
+        "date" : df.iloc[row_index]["Date"],
+        "gains" : gains,
+        "gains_percent" : gains_percent,
+    })

@@ -15,66 +15,41 @@ for (let i = 1996 ; i < 2025 ; i++) {
 
 export default function Page() {
     return (
-        <div className="m-24 text-3xl text-center">
+        <div className="m-24 text-3xl">
             <form action={sendPacket}>
-                <div className="w-full flex flex-wrap items-center justify-center">
-                    If you had invested in 
+                <div className="flex w-full items-center justify-center">
+                    If you had invested 
                     <Input 
                         className="w-32 m-3 text-green-700"
                         type="number" 
                         name="amount"
                     />
-                    shares of 
-                    <br/>
-                    <div className="flex m-3">
-                        <div className="my-1">NIFTY 50 on</div>
-                        <Select 
-                            className="w-16 text-rose-700 ml-6"
-                            name="date"
-                            placeholder="Date"
-                            aria-label="Date"
-                        >
-                            {days.map((day) => (
-                                <SelectItem key={day} value={day}>
-                                    {day}
-                                </SelectItem>
-                            ))}
-                        </Select>
-                        <Select 
-                            className="w-56 text-rose-700"
-                            name="month"
-                            placeholder="Month"
-                            aria-label="Month"
-                        >
-                            {months.map((month) => (
-                                <SelectItem key={month.substring(0,3)} value={(month)}>
-                                    {month}
-                                </SelectItem>
-                            ))}
-                        </Select>
-                        <Select 
-                            className="w-20 text-rose-700"
-                            name="year"
-                            placeholder="Year"
-                            aria-label="Year"
-                        >
-                            {years.map((year) => (
-                                <SelectItem key={year.substring(2)} value={year}>
-                                    {year}
-                                </SelectItem>
-                            ))}
-                        </Select>
-                        <p className="my-1">, then by today</p>
-                    </div>
-                    <p className="my-8">
-                        you&apos;d have a profit of:&emsp;
+                </div>
+                <div className="my-2 flex w-full items-center justify-center">
+                    <div>in NIFTY 50 on</div>
+                    <div 
+                        className="text-rose-700 ml-6"
+                        id="date"
+                    ></div>
+                    <p>&emsp;then in 1 year </p>
+                </div>
+                <div className="my-2 flex w-full items-center justify-center">
+                    <p> your money would be worth:&emsp;
                     </p> 
-                    <p className="text-green-700" id="profit"></p>
+                    <p className="text-green-700" id="gains"></p>
+                </div>
+                <div className="my-2 flex w-full items-center justify-center">
+                    <p>
+                        which in profit % is:&emsp;
+                    </p> 
+                    <p className="text-green-700" id="gains_percent"></p>
                     <br/>
                 </div>
-                <Button type="submit">
-                        Play
-                </Button>
+                <div className="m-5 flex w-full items-center justify-center">
+                    <Button type="submit">
+                            Play
+                    </Button>
+                </div>
             </form>
         </div>
     )
@@ -82,14 +57,15 @@ export default function Page() {
 
 async function sendPacket(formData: FormData) {
     const amount = formData.get('amount')
-    const date = formData.get('date') + "-" + formData.get('month') + "-" + formData.get('year')
     
     const params = new URLSearchParams();
-    params.append('date', date);
     params.append('amount', amount!.toString());
 
     const req = await fetch('http://localhost:8000/imf/?' + params)
-    const res = await req.json()
-    document.getElementById("profit")!.innerText = res.toString()
+    const res = JSON.parse(await req.json())
+    console.log(res)
+    document.getElementById("gains")!.innerText = res.gains
+    document.getElementById("gains_percent")!.innerText = res.gains_percent
+    document.getElementById("date")!.innerText = res.date
     return false
 }
