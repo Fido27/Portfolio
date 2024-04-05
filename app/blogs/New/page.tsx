@@ -63,7 +63,7 @@ export default function Blogs() {
                     />
 					Once you have the <span className="text-transparent bg-clip-text bg-gradient-to-r to-yellow-600 from-red-600">sample.png</span> created that has 4 tickets, populate the <i className="text-red-600">drawDestQuarter</i> variable with the pixel coordinates of the points on the first ticket of <span className="text-transparent bg-clip-text bg-gradient-to-r to-yellow-600 from-red-600">sample.png</span>.
 					<br />
-					Run the script, you should see the Tickets folder filling up. Don't worry if the numbers appear weirdly on the tickets. You can easily make the necessary adjustments by changing the coordinates a little bit or font size. Running the script again will just replace old tickets with the new ones. 
+					Run the script, you should see the Tickets folder filling up. Don&rsquo;t worry if the numbers appear weirdly on the tickets. You can easily make the necessary adjustments by changing the coordinates a little bit or font size. Running the script again will just replace old tickets with the new ones. 
                 </div>
             </div>
         </div>
