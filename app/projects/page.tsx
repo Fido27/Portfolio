@@ -18,7 +18,7 @@ const cardsList:Card[]=[
 export default function Projects() {
 
 	return (
-        <main className = "center">
+        <main>
             <Image
                 className={styles.bgImg}
                 src = "/Background/bg.jpg"

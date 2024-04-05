@@ -1,7 +1,9 @@
+import { blogCard } from "./blogCard";
+
 export default function Blogs() {
     return (
         <div>
-            Start of my blogs ig
+            {blogCard("yo" , "/pic.jpg" , "Tambola Ticket Generator" , "Python Script")}
         </div>
     );
 }
