@@ -6,7 +6,13 @@ from fastapi.concurrency import asynccontextmanager
 from fastapi.middleware.cors import CORSMiddleware
 import pandas as pd
 
+from app.api.linuxmancyclopedia import api as mancyclopedia
+
 df = pd.read_csv("app/api/nifty.csv")
+
+def start():
+    started = "FastAPI is Success"
+    print(started)
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -23,14 +29,19 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+app.include_router(mancyclopedia)
+# app.include_router(items.router)
+# app.include_router(
+#     admin.router,
+#     prefix="/admin",
+#     tags=["admin"],
+#     dependencies=[Depends(get_token_header)],
+#     responses={418: {"description": "I'm a teapot"}},
+# )
+
 @app.get("/")
 def root():
     return {"Hello": "World"}
-
-
-def start():
-    started = "FastAPI is Success"
-    print(started)
 
 @app.get("/imf/")
 def logic(amount):

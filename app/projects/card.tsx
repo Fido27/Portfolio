@@ -1,52 +1,52 @@
-import {Card, CardHeader, CardBody, CardFooter} from "@nextui-org/react"
 import Image from "next/image"
 import Link from "next/link"
+import { CardBody, CardContainer, CardItem } from "../ui/3d-card";
 
-function onMouseEnter(id:string) {
-    var card = document.getElementById(id)
-    var cardTitle = document.getElementById(id + "Title")
-    var cardDesc = document.getElementById(id + "Desc")
-    card?.classList.add("blur-sm")
-    cardTitle?.classList.replace("inset-y-36" , "inset-y-6")
-    cardDesc?.classList.replace("opacity-0" , "opacity-100")
-    cardDesc?.classList.replace("inset-y-56" , "inset-y-16")
-}
-
-function onMouseLeave(id:string) {
-    var card = document.getElementById(id)
-    var cardTitle = document.getElementById(id + "Title")
-    var cardDesc = document.getElementById(id + "Desc")
-    card?.classList.remove("blur-sm")
-    cardTitle?.classList.replace("inset-y-6" , "inset-y-36")
-    cardDesc?.classList.replace("opacity-100" , "opacity-0")
-    cardDesc?.classList.replace("inset-y-16" , "inset-y-56")
-}
-
-export function CardObj(id:string , src:string , title:string , desc:string) {
-  
+export function projectCard() {
 	return (
-        <Card onMouseEnter = {(e) => {onMouseEnter(id)}} onMouseLeave={(e) => {onMouseLeave(id)}} className = "z-20 border-2 border-dashed w-[300px] h-[200px] m-10 rounded-2xl">
-            <Link href="/blogs">
-                <Image
-                    className="object-cover relative w-[300px] h-[196px] rounded-2xl transition-all duration-300 delay-150"
-                    id = {id}
-                    src={src}
-                    alt={title + " Image"}
-                    height={0}
-                    width={250}
-                />
-            </Link>
-
-            <CardBody className="absolute">
-                <div className="m-3 mx-4">
-                    <div id={id + "Title"} className="absolute z-30 text-3xl inset-y-36 transition-all duration-500">
-                        {title}
-                    </div>
-                    <div id={id + "Desc"} className="absolute z-30 opacity-0 inset-y-56 transition-all duration-500">
-                        {desc}
-                    </div>
+        <CardContainer className="inter-var">
+            <CardBody className="bg-gray-50 relative group/card  dark:hover:shadow-2xl dark:hover:shadow-emerald-500/[0.1] dark:bg-black dark:border-white/[0.2] border-black/[0.1] w-auto h-auto rounded-xl p-6 border  ">
+                <CardItem
+                    translateZ="50"
+                    className="text-xl font-bold text-neutral-600 dark:text-white"
+                >
+                    Make things float in air
+                </CardItem>
+                <CardItem
+                    as="p"
+                    translateZ="60"
+                    className="text-neutral-500 text-sm max-w-sm mt-2 dark:text-neutral-300"
+                >
+                    Hover over this card to unleash the power of CSS perspective
+                </CardItem>
+                <CardItem translateZ="100" className=" mt-4">
+                    <Image
+                        src="/Background/bg.jpg"
+                        height="100"
+                        width="100"
+                        className="object-cover rounded-xl group-hover/card:shadow-xl"
+                        alt="thumbnail"
+                    />
+                </CardItem>
+                <div className="flex justify-between items-center mt-20">
+                    <CardItem
+                        translateZ={20}
+                        as={Link}
+                        href="https://twitter.com/mannupaaji"
+                        target="__blank"
+                        className="px-4 py-2 rounded-xl text-xs font-normal dark:text-white"
+                    >
+                        Try now →
+                    </CardItem>
+                    <CardItem
+                        translateZ={20}
+                        as="button"
+                        className="px-4 py-2 rounded-xl bg-black dark:bg-white dark:text-black text-white text-xs font-bold"
+                    >
+                        Sign up
+                    </CardItem>
                 </div>
             </CardBody>
-        </Card>
+        </CardContainer>
     );
 }
