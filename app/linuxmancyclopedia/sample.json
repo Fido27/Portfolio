@@ -1,0 +1,22 @@
+{
+	"cmd": "cat",
+	"author": "neko",
+	"flags": [
+		{
+			"id": "e",
+			"desc": "open editor"
+		},
+		{
+			"id": "t",
+			"desc": "show tabs"
+		},
+		{
+			"id": "n",
+			"desc": "show line nums"
+		},
+		{
+			"id": "c",
+			"desc": "be cute"
+		}
+	]
+}

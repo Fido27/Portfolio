@@ -15,9 +15,9 @@ export const InfiniteMovingCards = ({
 }: {
   items: {
     id: string;
-			src: string;
-			title: string;
-			desc: string;
+    src: string;
+    title: string;
+    desc: string;
   }[];
   direction?: "left" | "right";
   speed?: "fast" | "normal" | "slow";
@@ -89,7 +89,7 @@ export const InfiniteMovingCards = ({
           pauseOnHover && "hover:[animation-play-state:paused]"
         )}
       >
-				{items.map((item, idx) => (
+				{items.map((item) => (
 					<li
 						className="group z-20 relative rounded-2xl border border-b-0 flex-shrink-0 border-slate-700"
 						key={item.id}

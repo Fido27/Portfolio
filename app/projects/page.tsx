@@ -2,7 +2,6 @@
 import { MouseParallax } from "react-just-parallax";
 import Image from "next/image"
 import styles from '../styles.module.css'
-import { CardObj } from "../blogs/card";
 
 interface Card {
     id:string
@@ -32,7 +31,7 @@ export default function Projects() {
                 {CardObj(cardsList[0].id , cardsList[0].src , cardsList[0].title , cardsList[0].desc)}
             </MouseParallax> */}
 
-            {CardObj(cardsList[0].id , cardsList[0].src , cardsList[0].title , cardsList[0].desc)}
+            {/* {CardObj(cardsList[0].id , cardsList[0].src , cardsList[0].title , cardsList[0].desc)} */}
 
         </main>
     )
