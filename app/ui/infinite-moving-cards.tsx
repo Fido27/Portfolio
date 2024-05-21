@@ -106,8 +106,8 @@ export const InfiniteMovingCards = ({
 							</Link>
 						
 							<CardBody className="absolute">
-								<div className="mx-4">
-									<div className={"absolute z-30 text-xl inset-y-20 transition-all duration-500 group-hover:inset-y-4"}>
+								<div className="mx-1">
+									<div className={"absolute z-30 text-xl inset-y-22 inset-y-20 transition-all duration-500 group-hover:inset-y-4"}>
 										{item.title}
 									</div>
 									<div className={"absolute z-30 text-sm opacity-0 inset-y-36 transition-all duration-500 group-hover:opacity-100 group-hover:inset-y-12"}>

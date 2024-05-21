@@ -6,7 +6,7 @@ from fastapi.concurrency import asynccontextmanager
 from fastapi.middleware.cors import CORSMiddleware
 import pandas as pd
 
-from app.api.linuxmancyclopedia import api as mancyclopedia
+# from app.api.linuxmancyclopedia import api as mancyclopedia
 
 df = pd.read_csv("app/api/nifty.csv")
 
@@ -29,7 +29,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-app.include_router(mancyclopedia)
+# app.include_router(mancyclopedia)
 # app.include_router(items.router)
 # app.include_router(
 #     admin.router,

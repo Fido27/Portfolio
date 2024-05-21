@@ -2,20 +2,10 @@
 import { MouseParallax } from "react-just-parallax";
 import Image from "next/image"
 import styles from '../styles.module.css'
-
-interface Card {
-    id:string
-    src:string
-    title:string
-    desc:string
-}
-
-const cardsList:Card[]=[
-    {id: "placeholder" , src: "/Background/bean.jpg" , title: "Title" , desc:"This is the description"}
-]
+import { projectCard } from "./card";
+import { projectsList } from "./list";
 
 export default function Projects() {
-
 	return (
         <main>
             <Image
@@ -25,14 +15,13 @@ export default function Projects() {
                 fill
                 style={{
                     objectFit: 'cover',
-                    }}
+                }}
             />
             {/* <MouseParallax enableOnTouchDevice isAbsolutelyPositioned lerpEase={0.02} strength={0.3}>
                 {CardObj(cardsList[0].id , cardsList[0].src , cardsList[0].title , cardsList[0].desc)}
             </MouseParallax> */}
 
-            {/* {CardObj(cardsList[0].id , cardsList[0].src , cardsList[0].title , cardsList[0].desc)} */}
-
+            {projectCard(projectsList[0])}
         </main>
     )
 }

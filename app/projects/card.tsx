@@ -2,48 +2,61 @@ import Image from "next/image"
 import Link from "next/link"
 import { CardBody, CardContainer, CardItem } from "../ui/3d-card";
 
-export function projectCard() {
+interface Card {
+    title:string
+    desc:string
+    gitlink:string
+    morelink:string
+    imgsrc:string
+}
+
+export function projectCard(card:Card) {
 	return (
         <CardContainer className="inter-var">
-            <CardBody className="bg-gray-50 relative group/card  dark:hover:shadow-2xl dark:hover:shadow-emerald-500/[0.1] dark:bg-black dark:border-white/[0.2] border-black/[0.1] w-auto h-auto rounded-xl p-6 border  ">
+            <CardBody className="bg-gray-50 relative group/card  dark:hover:shadow-2xl dark:hover:shadow-emerald-500/[0.1] dark:bg-black dark:border-white/[0.2] border-black/[0.1] w-1/2 h-auto rounded-xl p-5 border">
+                <Image
+                    className="object-cover absolute rounded-xl group-hover/card:shadow-xl"
+                    src={card.imgsrc}
+                    alt="thumbnail"
+                    fill
+                />
                 <CardItem
-                    translateZ="50"
+                    translateZ={20}
                     className="text-xl font-bold text-neutral-600 dark:text-white"
                 >
-                    Make things float in air
+                    {card.title}
                 </CardItem>
                 <CardItem
                     as="p"
-                    translateZ="60"
+                    translateZ={60}
                     className="text-neutral-500 text-sm max-w-sm mt-2 dark:text-neutral-300"
                 >
-                    Hover over this card to unleash the power of CSS perspective
+                    {card.desc}
                 </CardItem>
-                <CardItem translateZ="100" className=" mt-4">
-                    <Image
-                        src="/Background/bg.jpg"
-                        height="100"
-                        width="100"
-                        className="object-cover rounded-xl group-hover/card:shadow-xl"
-                        alt="thumbnail"
-                    />
-                </CardItem>
-                <div className="flex justify-between items-center mt-20">
+                <div className="flex justify-between items-center mt-2">
                     <CardItem
                         translateZ={20}
                         as={Link}
-                        href="https://twitter.com/mannupaaji"
-                        target="__blank"
-                        className="px-4 py-2 rounded-xl text-xs font-normal dark:text-white"
+                        href={card.gitlink}
+                        target="_self"
+                        className="px-4 rounded-xl text-xs font-normal dark:text-white"
                     >
-                        Try now →
+                        <Image
+                            src = "/github.svg"
+                            alt = "Github Icon"
+                            width = "32"
+                            height = "32"
+                            className="mx-1"
+                        />
                     </CardItem>
                     <CardItem
                         translateZ={20}
-                        as="button"
+                        as={Link}
+                        href={card.morelink}
+                        target="_self"
                         className="px-4 py-2 rounded-xl bg-black dark:bg-white dark:text-black text-white text-xs font-bold"
                     >
-                        Sign up
+                        <pre>More →</pre>
                     </CardItem>
                 </div>
             </CardBody>

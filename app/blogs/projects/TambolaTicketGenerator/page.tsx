@@ -32,7 +32,7 @@ export default function Blogs() {
                     </div>
                     On an A4 sheet sized image (2480 x 3508), make your theme - the personality you want to give to the lottery ticket that&rsquo;s going in the hands of your audience. Make it according to the theme of the event or the section of the event when its played to make it more relatable and enjoyable to the audience.
                     <Image
-                        className="my-4"
+                        className="my-4 mx-auto w-2/5"
                         src = "/blogs/projects/TambolaTicketsGenerator/ticket.png"
                         alt = "Sample Parallax image"
                         width = "3000"
@@ -40,7 +40,7 @@ export default function Blogs() {
                     />
                     Make 15 circles, or any kind of placeholder to put your numbers in. We will now resize this image to fit in a quarter of the image as A4 would be too big for a tambola ticket. Copy and paste the image 3 times to fill the empty space and have 4 of the exact same image.
                     <Image
-                        className="my-4"
+                        className="my-4 mx-auto w-2/5"
                         src = "/blogs/projects/TambolaTicketsGenerator/sample.png"
                         alt = "Sample Parallax image"
                         width = "3000"
@@ -55,7 +55,7 @@ export default function Blogs() {
                     </div>
                     Enter the<span className="font-mono text-slate-400 text-sm mx-2">Number of Tickets</span>you want to generate in line 18 of this file. Line 19 sets the font to the <span className="text-transparent bg-clip-text bg-gradient-to-r to-teal-400 from-cyan-600">font.ttf</span> from earlier. <u>60</u> is the size of the text, change this to fit the numbers in the placeholder circles better. Run the script to check if numbers need to be bigger or smaller.
                     <Image
-                        className="my-4"
+                        className="my-4 mx-auto w-2/3"
                         src = "/blogs/projects/TambolaTicketsGenerator/script.png"
                         alt = "Sample Parallax image"
                         width = "3000"
@@ -64,6 +64,14 @@ export default function Blogs() {
 					Once you have the <span className="text-transparent bg-clip-text bg-gradient-to-r to-yellow-600 from-red-600">sample.png</span> created that has 4 tickets, populate the <i className="text-red-600">drawDestQuarter</i> variable with the pixel coordinates of the points on the first ticket of <span className="text-transparent bg-clip-text bg-gradient-to-r to-yellow-600 from-red-600">sample.png</span>.
 					<br />
 					Run the script, you should see the Tickets folder filling up. Don&rsquo;t worry if the numbers appear weirdly on the tickets. You can easily make the necessary adjustments by changing the coordinates a little bit or font size. Running the script again will just replace old tickets with the new ones. 
+                </div>
+                <div className="text-4xl my-5">
+                    Modifiablity Of My Code
+                </div>
+                <div>
+                    I modified my code to make double tickets, i.e. tickets with 30 numbers. The easiest way to craft this was to double a few of the numbers. However, with a few tweaks, my code can make tickets however you want. <a className="text-blue-800 underline" href="https://fido27.tech/contact">Contact me</a> for special requests.
+                    <br />
+                    If you use my script for double tickets, all you have to do is map the coordinates for 30 circles in the <i className="text-red-600">drawDestQuarter</i> variable.
                 </div>
             </div>
         </div>
