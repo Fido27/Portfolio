@@ -42,11 +42,10 @@ export function projectCard(card:Card) {
                         className="px-4 rounded-xl text-xs font-normal dark:text-white"
                     >
                         <Image
-                            src = "/github.svg"
+                            src = "/icons/github cartoon.svg"
                             alt = "Github Icon"
                             width = "32"
                             height = "32"
-                            className="mx-1"
                         />
                     </CardItem>
                     <CardItem

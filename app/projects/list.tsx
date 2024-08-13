@@ -10,15 +10,15 @@ export const projectsList:Card[]=[
     {   // 0
         title: "Longing",
         desc: "Social media for Long-Distance Relationship ideas", 
-        gitlink: "/Background/bean.jpg" ,  
-        morelink:"This is the description", 
-        imgsrc:"/Background/bg.jpg"
+        gitlink: "https://github.com/Fido27/longing" ,  
+        morelink: "/blogs/projects/longing", 
+        imgsrc: "/Background/bg.jpg"
     },
 	{	// 1
 		title: "Title",
         desc: "placeholder", 
         gitlink: "/Background/bean.jpg" ,  
-        morelink:"This is the description", 
-        imgsrc:""
+        morelink: "This is the description", 
+        imgsrc: ""
 	}
 ]

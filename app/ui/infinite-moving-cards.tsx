@@ -18,6 +18,7 @@ export const InfiniteMovingCards = ({
     src: string;
     title: string;
     desc: string;
+    bloglink: string;
   }[];
   direction?: "left" | "right";
   speed?: "fast" | "normal" | "slow";
@@ -84,7 +85,7 @@ export const InfiniteMovingCards = ({
       <ul
         ref={scrollerRef}
         className={cn(
-          " flex min-w-full shrink-0 gap-4 py-2 w-max flex-nowrap",
+          "flex min-w-full shrink-0 gap-4 py-2 w-max flex-nowrap",
           start && "animate-scroll ",
           pauseOnHover && "hover:[animation-play-state:paused]"
         )}
@@ -95,7 +96,7 @@ export const InfiniteMovingCards = ({
 						key={item.id}
 					>
 						<Card className = "w-[20vw] h-[20dvh] rounded-2xl">
-							<Link href="/blogs">
+							<Link href={item.bloglink}>
 								<Image
 									className={"object-cover relative w-full rounded-2xl transition-all duration-300 delay-150 group-hover:blur-sm"}
 									src={item.src}
@@ -106,14 +107,14 @@ export const InfiniteMovingCards = ({
 							</Link>
 						
 							<CardBody className="absolute">
-								<div className="mx-1">
-									<div className={"absolute z-30 text-xl inset-y-22 inset-y-20 transition-all duration-500 group-hover:inset-y-4"}>
+								<span className="mx-1">
+									<span className={"absolute z-30 text-xl inset-y-22 inset-y-20 transition-all duration-500 group-hover:inset-y-4"}>
 										{item.title}
-									</div>
-									<div className={"absolute z-30 text-sm opacity-0 inset-y-36 transition-all duration-500 group-hover:opacity-100 group-hover:inset-y-12"}>
+									</span>
+									<span className={"absolute z-30 text-sm opacity-0 inset-y-36 transition-all duration-500 group-hover:opacity-100 group-hover:inset-y-12"}>
 										{item.desc}
-									</div>
-								</div>
+									</span>
+								</span>
 							</CardBody>
 						</Card>
 					</li>

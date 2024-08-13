@@ -5,7 +5,7 @@ export default function Blogs() {
         <div className="m-32">
             <div id="blogPageStart" className="h-full">
                 <div id="blogTitle" className="text-6xl text-center font-bold text-transparent bg-clip-text bg-gradient-to-r to-purple-600 from-sky-400">
-                    Creative Tambola Ticket Generator
+                    Longing
                 </div>
             </div>
             <div id="blogByLine" className="text-lg text-center italic mt-3 mb-10">

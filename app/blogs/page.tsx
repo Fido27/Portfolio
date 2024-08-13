@@ -1,24 +1,7 @@
 import { HoverBorderGradient } from "../ui/hover-border-gradient";
 import { InfiniteMovingCards } from "../ui/infinite-moving-cards";
 import { Meteors } from "../ui/meteors";
-
-const cardsList1 = [
-    {id: "placeholder" , src: "/Background/bean.jpg" , title: "Title" , desc:"This is the description"},
-    {id: "placeholder5" , src: "/Background/bean.jpg" , title: "Title" , desc:"This is the description"},
-    {id: "placeholder543" , src: "/Background/bean.jpg" , title: "Title" , desc:"This is the description"},
-]
-
-const cardsList2 = [
-    {id: "placeholder" , src: "/Background/bean.jpg" , title: "Title" , desc:"This is the description"},
-    {id: "placeholder5" , src: "/Background/bean.jpg" , title: "Title" , desc:"This is the description"},
-    {id: "placeholder543" , src: "/Background/bean.jpg" , title: "Title" , desc:"This is the description"},
-]
-
-const cardsList3 = [
-    {id: "placeholder" , src: "/Background/bean.jpg" , title: "Title" , desc:"This is the description"},
-    {id: "placeholder5" , src: "/Background/bean.jpg" , title: "Title" , desc:"This is the description"},
-    {id: "placeholder543" , src: "/Background/bean.jpg" , title: "Title" , desc:"This is the description"},
-]
+import { projList , guideList , thotsList } from "./list";
 
 export default function Blogs() {
     return (
@@ -27,17 +10,17 @@ export default function Blogs() {
             <div className="basis-2/3 overflow-hidden">
 
                 <InfiniteMovingCards
-                    items={cardsList1}
+                    items={projList}
                     direction="right"
                     speed="fast"
                 />
                 <InfiniteMovingCards
-                    items={cardsList2}
+                    items={guideList}
                     direction="left"
                     speed="normal"
                 />
                 <InfiniteMovingCards
-                    items={cardsList3}
+                    items={thotsList}
                     direction="right"
                     speed="slow"
                 />

@@ -7,7 +7,7 @@ import { projectsList } from "./list";
 
 export default function Projects() {
 	return (
-        <main>
+        <main className="m-24">
             <Image
                 className={styles.bgImg}
                 src = "/Background/bg.jpg"
