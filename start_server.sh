@@ -1,6 +1,8 @@
 #!/bin/sh
 
 git pull
+
+# To directly run the servers
 # python -m venv venv
 # . venv/bin/activate
 # pip install -r requirements.txt
