@@ -1,6 +1,6 @@
 import Image from "next/image"
 import Link from "next/link"
-import { CardBody, CardContainer, CardItem } from "../ui/3d-card";
+import { CardBody, CardContainer, CardItem } from "../../lib/ui/3d-card";
 
 interface Card {
     title:string

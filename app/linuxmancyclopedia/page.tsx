@@ -1,7 +1,7 @@
 // 'use client'
-// import { Spotlight } from "../ui/spotlight"
-// // import { AILoad, aiload } from "../ui/ai-loading"
-// import { Dropdown, DropdownTrigger, Button, DropdownMenu, DropdownItem } from "@nextui-org/react";
+// import { Spotlight } from "../lib/ui/spotlight"
+// // import { AILoad, aiload } from "../lib/ui/ai-loading"
+// import { Dropdown, DropdownTrigger, Button, DropdownMenu, DropdownItem } from "@heroui/react";
 // import { useState } from "react";
 // import cat from "./sample.json"
 

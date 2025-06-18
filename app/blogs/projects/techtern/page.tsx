@@ -76,7 +76,7 @@ export default function Blogs() {
             />
           </div>
 
-          <div className="text-6xl my-5 text-transparent bg-clip-text bg-gradient-to-r to-purple-600 from-sky-400">
+          <div className="text-6xl my-5 p-2 text-transparent bg-clip-text bg-gradient-to-r to-purple-600 from-sky-400">
             Idea
           </div>
           <div>
@@ -105,7 +105,7 @@ export default function Blogs() {
             </ul>
           </div>
 
-          <div className="text-6xl my-5 text-transparent bg-clip-text bg-gradient-to-r to-purple-600 from-sky-400">
+          <div className="text-6xl my-5 p-2 text-transparent bg-clip-text bg-gradient-to-r to-purple-600 from-sky-400">
             Tech Stack & Architecture
           </div>
           <div>
@@ -148,7 +148,7 @@ export default function Blogs() {
           </div>
 
           <br />
-          <div className="text-6xl my-5 text-transparent bg-clip-text bg-gradient-to-r to-purple-600 from-sky-400">
+          <div className="text-6xl my-5 p-2 text-transparent bg-clip-text bg-gradient-to-r to-purple-600 from-sky-400">
             Interactive Visual Insights
           </div>
           <div>
@@ -164,7 +164,7 @@ export default function Blogs() {
             </ul>
           </div>
 
-          <div className="text-6xl my-5 text-transparent bg-clip-text bg-gradient-to-r to-purple-600 from-sky-400">
+          <div className="text-6xl my-5 p-2 text-transparent bg-clip-text bg-gradient-to-r to-purple-600 from-sky-400">
             Machine Learning for Pay Prediction
           </div>
           <div>
@@ -187,7 +187,7 @@ export default function Blogs() {
             just a job board — but a smart one.
           </div>
 
-          <div className="text-6xl my-5 text-transparent bg-clip-text bg-gradient-to-r to-purple-600 from-sky-400">
+          <div className="text-6xl my-5 p-2 text-transparent bg-clip-text bg-gradient-to-r to-purple-600 from-sky-400">
             Challenges We Tackled
           </div>
           <div>
@@ -212,7 +212,7 @@ export default function Blogs() {
             </ul>
           </div>
 
-          <div className="text-6xl my-5 text-transparent bg-clip-text bg-gradient-to-r to-purple-600 from-sky-400">
+          <div className="text-6xl my-5 p-2 text-transparent bg-clip-text bg-gradient-to-r to-purple-600 from-sky-400">
             Meet the Team
           </div>
           <div>
@@ -234,7 +234,7 @@ export default function Blogs() {
             tech.
           </div>
 
-          <div className="text-6xl my-5 text-transparent bg-clip-text bg-gradient-to-r to-purple-600 from-sky-400">
+          <div className="text-6xl my-5 p-2 text-transparent bg-clip-text bg-gradient-to-r to-purple-600 from-sky-400">
             Final Thoughts
           </div>
           <div>

@@ -9,27 +9,29 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@nextui-org/card": "latest",
-    "@nextui-org/react": "latest",
+    "@heroui/card": "latest",
+    "@heroui/react": "latest",
     "@radix-ui/react-label": "latest",
     "@tabler/icons-react": "latest",
-    "@types/node": "latest",
-    "@types/react": "latest",
-    "@types/react-dom": "latest",
     "autoprefixer": "latest",
-    "clsx": "latest",
-    "eslint": "latest",
-    "eslint-config-next": "latest",
-    "framer-motion": "^10.18.0",
-    "ldrs": "^1.0.1",
-    "next": "latest",
-    "postcss": "latest",
-    "react": "latest",
-    "react-code-blocks": "latest",
-    "react-dom": "latest",
-    "react-just-parallax": "latest",
-    "tailwind-merge": "latest",
-    "tailwindcss": "latest",
-    "typescript": "latest"
+    "clsx": "^2.1.1",
+    "daisyui": "latest",
+    "motion": "latest",
+    "next": "15.3.3",
+    "phaser": "^3.90.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "tailwind-merge": "^3.3.0"
+  },
+  "devDependencies": {
+    "@eslint/eslintrc": "^3",
+    "@tailwindcss/postcss": "^4.1.8",
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "eslint": "^9",
+    "eslint-config-next": "15.3.3",
+    "tailwindcss": "^4.1.8",
+    "typescript": "^5"
   }
 }

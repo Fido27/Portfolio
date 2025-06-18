@@ -1,8 +1,8 @@
 'use client'
-import { Input } from "../ui/input";
-import { Label } from "../ui/label";
-import { InputBox } from "../ui/multi-line-input";
-import { cn } from "../utils/cn";
+import { Input } from "../../lib/ui/input";
+import { Label } from "../../lib/ui/label";
+import { InputBox } from "../../lib/ui/multi-line-input";
+import { cn } from "../../lib/utils/cn";
 
 const BottomGradient = () => {
     return (
@@ -49,7 +49,7 @@ export default function page() {
 
                     <LabelInputContainer className="mb-4">
                         <Label htmlFor="email">Email Address</Label>
-                        <Input id="email" placeholder="aaravjain272003@gmail.com" type="email" />
+                        <Input id="email" placeholder="hash.encrip@example.com" type="email" />
                     </LabelInputContainer>
 
                     <LabelInputContainer className="mb-4">

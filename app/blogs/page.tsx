@@ -1,6 +1,6 @@
-import { HoverBorderGradient } from "../ui/hover-border-gradient";
-import { InfiniteMovingCards } from "../ui/infinite-moving-cards";
-import { Meteors } from "../ui/meteors";
+import { HoverBorderGradient } from "../../lib/ui/hover-border-gradient";
+import { InfiniteMovingCards } from "../../lib/ui/infinite-moving-cards";
+import { Meteors } from "../../lib/ui/meteors";
 import { projList , guideList , thotsList } from "./list";
 
 export default function Blogs() {
