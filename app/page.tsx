@@ -133,7 +133,7 @@ export default function Home() {
 							</a>
 						</li>
 						<li>
-							<a href = "http://discordapp.com/users/361380275533512724" target = "_blank">
+							<a href = "https://discordapp.com/users/361380275533512724" target = "_blank">
 							<Image
 								src = "/icons/discord cartoon.svg"
 								alt = "Discord Icon"

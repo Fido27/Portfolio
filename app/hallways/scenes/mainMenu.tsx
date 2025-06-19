@@ -1,5 +1,7 @@
+import Phaser from 'phaser';
+
 export class MainMenuScene extends Phaser.Scene {
-  constructor() { super('MainMenu'); }
+  constructor() { super('MainMenuScene'); }
   preload() {
     // load menu assets here if you have any
   }
@@ -14,7 +16,7 @@ export class MainMenuScene extends Phaser.Scene {
     .setInteractive({ useHandCursor: true });
 
     btn.on('pointerdown', () => {
-      this.scene.start('GameScene');
+      this.scene.start('HallwaysScene');
     });
   }
 }
