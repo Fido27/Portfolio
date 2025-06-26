@@ -1,6 +1,6 @@
 'use client';
 import { useEffect, useRef } from 'react';
-import Phaser from 'phaser';
+import * as Phaser from 'phaser';
 import { HallwaysScene } from './scenes/hallwaysGame';
 import { MainMenuScene } from './scenes/mainMenu';
 
@@ -12,7 +12,7 @@ export default function HallwaysGame() {
 
     const config: Phaser.Types.Core.GameConfig = {
       type: Phaser.AUTO,
-      width: 1000,
+      width: 1750,
       height: 1000,
       backgroundColor: '#ffffff',
       parent: containerRef.current,

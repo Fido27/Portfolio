@@ -81,14 +81,14 @@ export default function Blogs() {
                   "disaster_resilience_program.png",
                   "login_page.png",
                 ].map((img, i) => (
-                  <div className="carousel-item w-48 sm:w-56 md:w-full" key={i}>
+                  <div className="carousel-item w-48 sm:w-56 md:w-72 lg:w-96" key={i}>
                     <Image
                       className="my-2 rounded-box w-full h-auto object-contain"
                       src={`/blogs/projects/disaster_resilience_weather_app/${img}`}
                       alt={`Screenshot ${i + 1}`}
                       width={0}
                       height={0}
-                      sizes="(max-width: 640px) 48vw, (max-width: 768px) 56vw, 100vw"
+                      sizes="100vw"
                     />
                   </div>
                 ))}
