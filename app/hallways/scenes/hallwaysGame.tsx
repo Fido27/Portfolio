@@ -1,85 +1,10 @@
 import * as Phaser from 'phaser';
-
-function drawDiagram(scene: Phaser.Scene) {
-  const g = scene.add.graphics();
-
-  const drawSquare = (
-    x: number,
-    y: number,
-    color: number,
-    letter: string,
-    text: string
-  ) => {
-    g.fillStyle(color, 1).fillRect(0, 0, 120, 120);
-    const texKey = `box-${letter}`;
-    g.generateTexture(texKey, 120, 120);
-    g.clear();
-    scene.add.image(x, y, texKey).setAngle(45);
-    scene.add
-      .text(x, y, `${letter}\n${text}`, {
-        font: '20px Arial',
-        color: '#000',
-      })
-      .setOrigin(0.5)
-      .setAlign('center');
-  };
-
-  // 4 subject diamonds
-  drawSquare(150, 650, 0xa9b7e1, 'A', 'Art');
-  drawSquare(150, 150, 0xe19a9a, 'B', 'Biology');
-  drawSquare(650, 150, 0xf7e199, 'C', 'Civics');
-  drawSquare(650, 650, 0xaedbad, 'D', 'Drama');
-
-  // outer rectangle
-  g.lineStyle(4, 0x000000).strokeRect(200, 200, 400, 400);
-
-  // inner "hallways":
-  g.lineStyle(4, 0x000000);
-  const wall1 = new Phaser.Geom.Triangle(
-      275, 275,
-      475, 275, 
-      275, 475
-  );
-  const wall2 = new Phaser.Geom.Triangle(
-      325, 525,
-      525, 325,
-      525, 525
-  );
-  g.strokeTriangleShape(wall1);
-  g.strokeTriangleShape(wall2);
-
-  // cameras C1–C5
-  const cams = [
-    { x: 200, y: 400, angle: -90, label: 'C1' },
-    { x: 400, y: 200, angle: 0, label: 'C2' },
-    { x: 400, y: 400, angle: 180, label: 'C3' },
-    { x: 600, y: 400, angle: 90, label: 'C4' },
-    { x: 400, y: 600, angle: 180, label: 'C5' },
-  ];
-  cams.forEach(({ x, y, angle, label }) => {
-    scene.add.image(x, y, 'camera').setAngle(angle).setScale(0.3);
-    scene.add
-      .text(x + 15, y - 15, label, { font: '18px Arial', color: '#000' });
-  });
-
-  // Draw all arrows as interactive images and return references
-  const arrows = {
-    left: scene.add.image(240, 400, 'red_arrow').setScale(0.3).setAngle(-90).setInteractive({ useHandCursor: true }),
-    top: scene.add.image(400, 240, 'red_arrow').setScale(0.3).setAngle(0).setInteractive({ useHandCursor: true }),
-    right: scene.add.image(565, 400, 'red_arrow').setScale(0.3).setAngle(90).setInteractive({ useHandCursor: true }),
-    bottom: scene.add.image(400, 565, 'red_arrow').setScale(0.3).setAngle(180).setInteractive({ useHandCursor: true }),
-    center: scene.add.image(400, 400, 'red_arrow').setScale(0.3).setAngle(135).setInteractive({ useHandCursor: true })
-  };
-
-  // Draw a green solid circle as a GameObject
-  const greenCircle = scene.add.circle(240, 560, 18, 0x2ecc40);
-
-  return { greenCircle, arrows };
-}
+import { drawMatrixInput, drawVectorDisplay, MatrixInput, MatrixInputCell, drawDiagram } from './matrixDrawUtils';
 
 export class HallwaysScene extends Phaser.Scene {
   private startTime!: number;
   private timerText!: Phaser.GameObjects.Text;
+  private matrixInput?: MatrixInput;
 
   constructor() { super('HallwaysScene'); }
 
@@ -94,9 +19,8 @@ export class HallwaysScene extends Phaser.Scene {
       font: '20px Arial',
       color: '#000'
     }).setOrigin(0, 0);
-    
-    // Add the interactive math question and camera data vectors in the empty area (right side)
-    this.add.text(1100, 200,
+
+    this.add.text(1100, 120,
       'Describe the route or routes Ella may have taken that correspond to the following camera data vectors:',
       {
         font: '24px Arial',
@@ -104,26 +28,12 @@ export class HallwaysScene extends Phaser.Scene {
         wordWrap: { width: 500 }
       }
     );
-    // (a) vector
-    this.add.text(
-      1100, 270,
-      '(a)    v = [3\n           3\n           3\n           0\n           3]',
-      {
-        font: '24px Arial',
-        color: '#222',
-        align: 'left'
-      }
-    );
-    // (b) vector, offset to the right
-    this.add.text(
-      1250, 270,
-      '(b)    w = [5\n           5\n           3\n           2\n           3]',
-      {
-        font: '24px Arial',
-        color: '#222',
-        align: 'left'
-      }
-    );
+
+    // Remove ASCII-style output vectors and use bracketed vector display
+    this.add.text(1100, 370, '(a)', { font: '22px Arial', color: '#222' });
+    this.add.text(1250, 370, '(b)', { font: '22px Arial', color: '#222' });
+    drawVectorDisplay(this, 1160, 300, [3, 3, 3, 0, 3], 40); // v vector
+    drawVectorDisplay(this, 1310, 300, [5, 5, 3, 2, 3], 40); // w vector
 
     var c1 = 0;
     var c2 = 0;
@@ -144,6 +54,9 @@ export class HallwaysScene extends Phaser.Scene {
           ease: 'Power2',
         });
         c1++;
+        if (this.matrixInput) {
+          this.matrixInput.setValue(0, 0, c1.toString());
+        }
       }
     });
     arrows.top.on('pointerdown', () => {
@@ -156,6 +69,9 @@ export class HallwaysScene extends Phaser.Scene {
           ease: 'Power2',
         });
         c2++;
+        if (this.matrixInput) {
+          this.matrixInput.setValue(1, 0, c2.toString());
+        }
       }
     });
     arrows.right.on('pointerdown', () => {
@@ -167,7 +83,10 @@ export class HallwaysScene extends Phaser.Scene {
           duration: 1000,
           ease: 'Power2',
         });
-        c4++;
+        c3++;
+        if (this.matrixInput) {
+          this.matrixInput.setValue(2, 0, c3.toString());
+        }
       }
     });
     arrows.bottom.on('pointerdown', () => {
@@ -180,6 +99,9 @@ export class HallwaysScene extends Phaser.Scene {
           ease: 'Power2',
         });
         c5++;
+        if (this.matrixInput) {
+          this.matrixInput.setValue(4, 0, c5.toString());
+        }
       }
     });
     arrows.center.on('pointerdown', () => {
@@ -191,7 +113,10 @@ export class HallwaysScene extends Phaser.Scene {
           duration: 1000,
           ease: 'Power2',
         });
-        c3++;
+        c4++;
+        if (this.matrixInput) {
+          this.matrixInput.setValue(3, 0, c4.toString());
+        }
       }
     });
 
@@ -252,6 +177,72 @@ export class HallwaysScene extends Phaser.Scene {
       align: 'center',
       fontStyle: 'bold'
     }).setOrigin(1, 0.5).setInteractive({ useHandCursor: true });
+
+    this.matrixInput = drawMatrixInput(this, 1150, 620, 5, 1, 50);
+    
+    // Initialize matrix input with current c1-c5 values
+    this.matrixInput.setValue(0, 0, c1.toString());
+    this.matrixInput.setValue(1, 0, c2.toString());
+    this.matrixInput.setValue(2, 0, c3.toString());
+    this.matrixInput.setValue(3, 0, c4.toString());
+    this.matrixInput.setValue(4, 0, c5.toString());
+
+    // Add Play button next to the input matrix
+    const playBtn = this.add.text(1150 + 80, 620, '▶ Play', {
+      font: '24px Arial',
+      color: '#fff',
+      backgroundColor: '#008800',
+      padding: { left: 16, right: 16, top: 8, bottom: 8 },
+      align: 'center',
+      fontStyle: 'bold'
+    }).setOrigin(0, 0.5).setInteractive({ useHandCursor: true });
+
+    let isPlaying = false;
+    playBtn.on('pointerdown', async () => {
+      if (isPlaying) return;
+      isPlaying = true;
+      playBtn.setAlpha(0.5);
+      // Read c1-c5 from input matrix (in case user changed them)
+      const cVals = [0, 0, 0, 0, 0];
+      for (let i = 0; i < 5; i++) {
+        cVals[i] = parseInt(this.matrixInput!.getValue(i, 0)) || 0;
+      }
+      // Define movement steps: left, top, right (c3), center (c4), bottom
+      const moves = [
+        { x: 240, y: 240 }, // left (c1)
+        { x: 560, y: 240 }, // top (c2)
+        { x: 560, y: 560 }, // right (c3)
+        { x: 240, y: 560 }, // center (c4)
+        { x: 240, y: 560 }, // bottom (c5)
+      ];
+      // Build the path
+      let path = [];
+      for (let i = 0; i < 5; i++) {
+        for (let j = 0; j < cVals[i]; j++) {
+          path.push(i);
+        }
+      }
+      // Get greenCircle reference and reset its position
+      const { greenCircle } = drawDiagram(this);
+      greenCircle.setPosition(240, 560);
+      // Animate path
+      for (let idx = 0; idx < path.length; idx++) {
+        const moveIdx = path[idx];
+        const { x, y } = moves[moveIdx];
+        await new Promise(res => {
+          this.tweens.add({
+            targets: greenCircle,
+            x,
+            y,
+            duration: 600,
+            ease: 'Power2',
+            onComplete: res
+          });
+        });
+      }
+      isPlaying = false;
+      playBtn.setAlpha(1);
+    });
   }
 
   update(time: number) {
