@@ -67,6 +67,9 @@ export function drawMatrixInput(
         if (focusedCell) focusedCell.rect.setStrokeStyle(2, 0x000000);
         focusedCell = cell;
         rect.setStrokeStyle(4, 0x4287f5); // Highlight
+        // Clear the value and text on click
+        values[cell.row][cell.col] = '';
+        cell.text.setText('');
         scene.input.keyboard?.off('keydown');
         scene.input.keyboard?.on('keydown', (event: KeyboardEvent) => {
           if (!focusedCell) return;
@@ -116,6 +119,7 @@ export function drawVectorDisplay(
   values: (string|number)[],
   cellSize = 50
 ) {
+  const group = scene.add.group();
   const spacing = 10;
   const rows = values.length;
   const extraHeight = 30;
@@ -134,15 +138,18 @@ export function drawVectorDisplay(
   g.strokeLineShape(new Phaser.Geom.Line(rightX + bracketWidth, y + bracketYOffset, rightX + bracketWidth, y + bracketHeight + bracketYOffset));
   g.strokeLineShape(new Phaser.Geom.Line(rightX, y + bracketYOffset, rightX + bracketWidth + overlap, y + bracketYOffset));
   g.strokeLineShape(new Phaser.Geom.Line(rightX, y + bracketHeight + bracketYOffset, rightX + bracketWidth + overlap, y + bracketHeight + bracketYOffset));
+  group.add(g);
   // Draw values as text
   for (let row = 0; row < rows; row++) {
     const cellY = y + row * (cellSize + spacing);
-    scene.add.text(x + cellSize/2, cellY + cellSize/2, String(values[row]), {
+    const txt = scene.add.text(x + cellSize/2, cellY + cellSize/2, String(values[row]), {
       font: '24px Arial',
       color: '#000',
       align: 'center',
     }).setOrigin(0.5);
+    group.add(txt);
   }
+  return group;
 }
 
 export function drawDiagram(scene: Phaser.Scene) {
