@@ -12,7 +12,7 @@ export class HallwaysScene extends Phaser.Scene {
   private aVector?: Phaser.GameObjects.Group;
   private bVector?: Phaser.GameObjects.Group;
   private nextBtn?: Phaser.GameObjects.Text;
-  private inputStep: number = 0;
+  private gameState: number = 0; // 0: main menu, 1: part (a), 2: part (b), 3: final input
 
   constructor() { super('HallwaysScene'); }
 
@@ -42,8 +42,12 @@ export class HallwaysScene extends Phaser.Scene {
     // Draw vector displays as Phaser Groups for easy visibility control
     this.aVector = drawVectorDisplay(this, 1160, 300, [3, 3, 3, 0, 3], 40);
     this.bVector = drawVectorDisplay(this, 1310, 300, [5, 5, 3, 2, 3], 40);
-    // Hide (b) label and vector at start
+    
+    // Initially hide all question UI elements since we start at gameState 0
+    this.questionPrompt.setVisible(false);
+    this.aLabel.setVisible(false);
     this.bLabel.setVisible(false);
+    this.aVector.setVisible(false);
     this.bVector.setVisible(false);
 
     const { greenCircle, arrows } = drawDiagram(this);
@@ -167,6 +171,29 @@ export class HallwaysScene extends Phaser.Scene {
       fontStyle: 'bold'
     }).setOrigin(0, 0.5).setInteractive({ useHandCursor: true });
 
+    // Reset button under the play button
+    const resetBtn = this.add.text(1150 + 80, 680, 'Reset', {
+      font: '24px Arial',
+      color: '#fff',
+      backgroundColor: '#666',
+      padding: { left: 16, right: 16, top: 8, bottom: 8 },
+      align: 'center',
+      fontStyle: 'bold'
+    }).setOrigin(0, 0.5).setInteractive({ useHandCursor: true });
+
+    resetBtn.on('pointerdown', () => {
+      // Reset all matrix input values to 0
+      if (this.matrixInput) {
+        for (let i = 0; i < 5; i++) {
+          this.matrixInput.setValue(i, 0, '0');
+        }
+      }
+      // Reset green circle position to starting position
+      if (this.greenCircle) {
+        this.greenCircle.setPosition(240, 560);
+      }
+    });
+
     let isPlaying = false;
     playBtn.on('pointerdown', async () => {
       if (isPlaying) return;
@@ -266,9 +293,15 @@ export class HallwaysScene extends Phaser.Scene {
     });
 
     // Next button logic for multi-step UI
-    this.inputStep = 0;
+    this.gameState = 0;
     this.nextBtn.on('pointerdown', () => {
-      if (this.inputStep === 0) {
+      if (this.gameState === 0) {
+        // Show the question UI for part (a)
+        if (this.questionPrompt) this.questionPrompt.setVisible(true);
+        if (this.aLabel) this.aLabel.setVisible(true);
+        if (this.aVector) this.aVector.setVisible(true);
+        this.gameState = 1;
+      } else if (this.gameState === 1) {
         // Check for [3,3,3,0,3]
         const vals = [0, 0, 0, 0, 0];
         for (let i = 0; i < 5; i++) vals[i] = parseInt(this.matrixInput?.getValue(i, 0) || '0') || 0;
@@ -279,8 +312,8 @@ export class HallwaysScene extends Phaser.Scene {
         // Show (b) label and vector
         if (this.bLabel) this.bLabel.setVisible(true);
         if (this.bVector) this.bVector.setVisible(true);
-        this.inputStep = 1;
-      } else if (this.inputStep === 1) {
+        this.gameState = 2;
+      } else if (this.gameState === 2) {
         // Check for [5,5,3,2,3]
         const vals = [0, 0, 0, 0, 0];
         for (let i = 0; i < 5; i++) vals[i] = parseInt(this.matrixInput?.getValue(i, 0) || '0') || 0;
@@ -305,7 +338,7 @@ export class HallwaysScene extends Phaser.Scene {
             this.matrixInput.cells[i][0].rect.setInteractive({ useHandCursor: true });
           }
         }
-        this.inputStep = 2;
+        this.gameState = 3;
       }
     });
   }
