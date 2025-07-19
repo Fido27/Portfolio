@@ -67,7 +67,7 @@ export default function Page() {
                         <span>100 years</span>
                     </div>
                     <div className="mt-4 text-lg text-white">
-                        Accumulated: <span className="font-mono">₹{currentAccum.toLocaleString(undefined, { maximumFractionDigits: 0 })}</span>
+                        Accumulated: <span className="font-mono">₹{formatIndianNumber(Math.floor(currentAccum))}</span>
                     </div>
                 </div>
                 <div className="w-full flex flex-col items-center space-y-8">
