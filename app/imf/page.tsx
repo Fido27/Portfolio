@@ -6,8 +6,8 @@ export default function Page() {
     const [progress, setProgress] = useState(0);
     const [expProgress, setExpProgress] = useState(0);
     const [timeMonths, setTimeMonths] = useState(0); // 0 to 720 months (60 years)
-    const [sip, setSIP] = useState(500);
-    const [goal, setGoal] = useState(5000000);
+    const [sip, setSIP] = useState(5000);
+    const [goal, setGoal] = useState(10000000);
 
     // Constants
     const annualRate = 0.12;
