@@ -202,14 +202,15 @@ export function drawDiagram(scene: Phaser.Scene) {
 
   // cameras C1–C5
   const cams = [
-    { x: 200, y: 400, angle: -90, label: 'C1' },
-    { x: 400, y: 200, angle: 0, label: 'C2' },
-    { x: 600, y: 400, angle: 90, label: 'C3' },
-    { x: 400, y: 400, angle: 180, label: 'C4' },
-    { x: 400, y: 600, angle: 180, label: 'C5' },
+    { x: 200, y: 400, angle: -40, label: 'C1', offsetX: 20, offsetY: -60, scale: 0.025 },
+    { x: 400, y: 200, angle: 30, label: 'C2', offsetX: -60, offsetY: 20, scale: 0.025 },
+    { x: 600, y: 400, angle: 150, label: 'C3', offsetX: -10, offsetY: 80, scale: 0.025 },
+    { x: 400, y: 400, angle: 180, label: 'C4', offsetX: -30, offsetY: 60, scale: 0.025 },
+    { x: 400, y: 600, angle: 225, label: 'C5', offsetX: -70, offsetY: -20, scale: 0.025 },
   ];
-  cams.forEach(({ x, y, angle, label }) => {
-    scene.add.image(x, y, 'camera').setAngle(angle).setScale(0.3);
+  cams.forEach(({ x, y, angle, label, offsetX = 0, offsetY = 0, scale = 0.13 }) => {
+    // Place security camera image with per-camera adjustment
+    scene.add.image(x + offsetX, y + offsetY, 'security_cam').setAngle(angle).setScale(scale);
     scene.add
       .text(x + 15, y - 15, label, { font: '18px Arial', color: '#000' });
   });
