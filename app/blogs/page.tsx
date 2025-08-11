@@ -1,7 +1,7 @@
 import { HoverBorderGradient } from "../../lib/ui/hover-border-gradient";
 import { InfiniteMovingCards } from "../../lib/ui/infinite-moving-cards";
-import { Meteors } from "../../lib/ui/meteors";
 import { projList , guideList , thotsList } from "./list";
+import { Meteors } from "@/lib/ui/meteors";
 
 export default function Blogs() {
     return (
@@ -31,6 +31,7 @@ export default function Blogs() {
 
             <div className="basis-1/3 grid grid-cols-2 grid-flow-row gap-4">
 
+
                 <HoverBorderGradient
                     containerClassName="w-full aspect-square rounded-3xl relative overflow-hidden"
                     as="button"
@@ -38,10 +39,9 @@ export default function Blogs() {
                     className="dark:bg-black bg-white text-black dark:text-white flex items-center"
                 >
                     <Meteors/>
-                    <span className="">
-                        Projects
-                    </span>
+                    <span className="text-2xl font-bold">Projects</span>
                 </HoverBorderGradient>
+
                 
                 <HoverBorderGradient
                     containerClassName="w-full aspect-square rounded-3xl relative overflow-hidden"
@@ -50,11 +50,9 @@ export default function Blogs() {
                     className="dark:bg-black bg-white text-black dark:text-white flex items-center"
                 >
                     <Meteors/>
-                    <span className="">
-                        Guides
-                    </span>
+                    <span className="text-2xl font-bold">Guides</span>
                 </HoverBorderGradient>
-                
+
                 <HoverBorderGradient
                     containerClassName="w-full aspect-square rounded-3xl relative overflow-hidden"
                     as="button"
@@ -62,21 +60,17 @@ export default function Blogs() {
                     className="dark:bg-black bg-white text-black dark:text-white flex items-center"
                 >
                     <Meteors/>
-                    <span className="">
-                        Thoughts
-                    </span>
+                    <span className="text-2xl font-bold">Thoughts</span>
                 </HoverBorderGradient>
-                
+
                 <HoverBorderGradient
                     containerClassName="w-full aspect-square rounded-3xl relative overflow-hidden"
                     as="button"
-                    duration={1.5}
+                    duration={1}
                     className="dark:bg-black bg-white text-black dark:text-white flex items-center"
                 >
                     <Meteors/>
-                    <span className="">
-                        Misc
-                    </span>
+                    <span className="text-2xl font-bold">Misc</span>
                 </HoverBorderGradient>
                 
             </div>
