@@ -11,6 +11,14 @@ export interface GameStateData {
   aVector?: Phaser.GameObjects.Group;
   bVector?: Phaser.GameObjects.Group;
   peopleCellText?: Phaser.GameObjects.Text;
+  // People management
+  hallwayCount?: number; // number of people currently in the hallway group following the green dot
+  roomCounts?: { A: number; B: number; C: number; D: number };
+  roomPeopleTexts?: { A?: Phaser.GameObjects.Text; B?: Phaser.GameObjects.Text; C?: Phaser.GameObjects.Text; D?: Phaser.GameObjects.Text };
+  roomPeopleRects?: { A?: Phaser.GameObjects.Rectangle; B?: Phaser.GameObjects.Rectangle; C?: Phaser.GameObjects.Rectangle; D?: Phaser.GameObjects.Rectangle };
+  roomDots?: { [key in 'A'|'B'|'C'|'D']?: Phaser.GameObjects.Group };
+  currentNode?: 'A' | 'B' | 'C' | 'D';
+  occupancyVector?: Phaser.GameObjects.Group;
   selectedStart: string | null;
   selectedDest: string | null;
   peopleValue: string;
@@ -52,10 +60,13 @@ export abstract class BaseState {
       };
       
       let target = { x: 240, y: 560 };
+      let startKey: 'A'|'B'|'C'|'D' = 'A';
       if (this.data.selectedStart && nodeCoords[this.data.selectedStart as keyof typeof nodeCoords]) {
         target = nodeCoords[this.data.selectedStart as keyof typeof nodeCoords];
+        startKey = this.data.selectedStart as 'A'|'B'|'C'|'D';
       }
       this.data.greenCircle.setPosition(target.x, target.y);
+      this.data.currentNode = startKey;
     }
   }
 

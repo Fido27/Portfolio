@@ -1,7 +1,9 @@
+"use client"
 import { HoverBorderGradient } from "../../lib/ui/hover-border-gradient";
 import { InfiniteMovingCards } from "../../lib/ui/infinite-moving-cards";
 import { projList , guideList , thotsList } from "./list";
-import { Meteors } from "@/lib/ui/meteors";
+import dynamic from "next/dynamic";
+const MeteorsClient = dynamic(() => import("@/lib/ui/meteors").then(m => m.Meteors), { ssr: false });
 
 export default function Blogs() {
     return (
@@ -38,7 +40,7 @@ export default function Blogs() {
                     duration={0.8}
                     className="dark:bg-black bg-white text-black dark:text-white flex items-center"
                 >
-                    <Meteors/>
+                    <MeteorsClient/>
                     <span className="text-2xl font-bold">Projects</span>
                 </HoverBorderGradient>
 
@@ -49,7 +51,7 @@ export default function Blogs() {
                     duration={1.2}
                     className="dark:bg-black bg-white text-black dark:text-white flex items-center"
                 >
-                    <Meteors/>
+                    <MeteorsClient/>
                     <span className="text-2xl font-bold">Guides</span>
                 </HoverBorderGradient>
 
@@ -59,7 +61,7 @@ export default function Blogs() {
                     duration={1}
                     className="dark:bg-black bg-white text-black dark:text-white flex items-center"
                 >
-                    <Meteors/>
+                    <MeteorsClient/>
                     <span className="text-2xl font-bold">Thoughts</span>
                 </HoverBorderGradient>
 
@@ -69,7 +71,7 @@ export default function Blogs() {
                     duration={1}
                     className="dark:bg-black bg-white text-black dark:text-white flex items-center"
                 >
-                    <Meteors/>
+                    <MeteorsClient/>
                     <span className="text-2xl font-bold">Misc</span>
                 </HoverBorderGradient>
                 

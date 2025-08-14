@@ -2,10 +2,10 @@ export const projList = [
 
     {   // 0
         id: "longing", 
-        src: "/Background/bean.jpg", // TODO - Change this
+        src: "/blogs/projects/longing/longing-card-bg.png", 
         title: "Longing",
         desc: "Social media for Long-Distance Relationship ideas",
-        bloglink: "https://github.com/Fido27/longing"
+        bloglink: "/blogs/projects/longing"
     },
 
     {   // 1
@@ -16,8 +16,13 @@ export const projList = [
         bloglink: "/blogs/projects/techtern"
     },
 
-    {id: "placeholder543" , src: "/Background/bean.jpg" , title: "Title" , desc:"This is the description",
-        bloglink: "https://github.com/Fido27/longing"},
+    {   // 2
+        id: "disaster_resilience_weather_app" , 
+        src: "/blogs/projects/disaster_resilience_weather_app/blog-nail.png" , 
+        title: "Disaster Resilience",
+        desc:"A weather app that provides disaster resilience information",
+        bloglink: "/blogs/projects/disaster_resilience_weather_app"
+    },
 ]
 
 export const guideList = [

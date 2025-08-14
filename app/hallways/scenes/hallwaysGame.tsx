@@ -74,7 +74,13 @@ export class HallwaysScene extends Phaser.Scene {
       peopleValue: '1',
       inputMatrixEnabled: true,
       arrowsEnabled: true,
-      isPlaying: false
+      isPlaying: false,
+      hallwayCount: 1,
+      roomCounts: { A: 0, B: 0, C: 0, D: 0 },
+      roomPeopleTexts: {},
+      roomPeopleRects: {},
+      roomDots: {},
+      currentNode: 'A'
     };
 
     // Create UI elements and store in shared data
@@ -122,6 +128,7 @@ export class HallwaysScene extends Phaser.Scene {
     const { greenCircle, arrows } = drawDiagram(this);
     this.sharedData.greenCircle = greenCircle;
     this.sharedData.arrows = arrows;
+    this.sharedData.currentNode = 'A';
 
     // Draw input matrix
     this.sharedData.matrixInput = drawMatrixInput(this, 1150, 620, 5, 1, 50);
@@ -145,6 +152,7 @@ export class HallwaysScene extends Phaser.Scene {
 
     arrows.left.on('pointerdown', () => {
       if (Math.abs(greenCircle.x - 240) < 2 && Math.abs(greenCircle.y - 560) < 2) {
+        this.animateHallwayDots({x:240,y:560}, {x:240,y:240}, this.sharedData.hallwayCount || 0);
         this.tweens.add({
           targets: greenCircle,
           x: 240,
@@ -159,6 +167,7 @@ export class HallwaysScene extends Phaser.Scene {
 
     arrows.top.on('pointerdown', () => {
       if (Math.abs(greenCircle.x - 240) < 2 && Math.abs(greenCircle.y - 240) < 2) {
+        this.animateHallwayDots({x:240,y:240}, {x:560,y:240}, this.sharedData.hallwayCount || 0);
         this.tweens.add({
           targets: greenCircle,
           x: 560,
@@ -173,6 +182,7 @@ export class HallwaysScene extends Phaser.Scene {
 
     arrows.right.on('pointerdown', () => {
       if (Math.abs(greenCircle.x - 560) < 2 && Math.abs(greenCircle.y - 240) < 2) {
+        this.animateHallwayDots({x:560,y:240}, {x:560,y:560}, this.sharedData.hallwayCount || 0);
         this.tweens.add({
           targets: greenCircle,
           x: 560,
@@ -187,6 +197,7 @@ export class HallwaysScene extends Phaser.Scene {
 
     arrows.bottom.on('pointerdown', () => {
       if (Math.abs(greenCircle.x - 560) < 2 && Math.abs(greenCircle.y - 560) < 2) {
+        this.animateHallwayDots({x:560,y:560}, {x:240,y:560}, this.sharedData.hallwayCount || 0);
         this.tweens.add({
           targets: greenCircle,
           x: 240,
@@ -201,6 +212,7 @@ export class HallwaysScene extends Phaser.Scene {
 
     arrows.center.on('pointerdown', () => {
       if (Math.abs(greenCircle.x - 560) < 2 && Math.abs(greenCircle.y - 240) < 2) {
+        this.animateHallwayDots({x:560,y:240}, {x:240,y:560}, this.sharedData.hallwayCount || 0);
         this.tweens.add({
           targets: greenCircle,
           x: 240,
@@ -214,13 +226,50 @@ export class HallwaysScene extends Phaser.Scene {
     });
   }
 
+  private animateHallwayDots(from: {x:number;y:number}, to: {x:number;y:number}, count: number) {
+    const n = Math.min(20, Math.max(0, count));
+    const perRow = 5;
+    for (let i = 0; i < n; i++) {
+      const r = Math.floor(i / perRow);
+      const c = i % perRow;
+      const dx = (c - (perRow - 1) / 2) * 10;
+      const dy = (r - 1) * 10;
+      const dot = this.add.circle(from.x + dx, from.y + dy, 5, 0x2ecc40);
+      this.tweens.add({ targets: dot, x: to.x + dx, y: to.y + dy, duration: 400, ease: 'Power2', onComplete: () => dot.destroy() });
+    }
+  }
+
   private updatePosition(newPosition: string) {
     this.currentPosition = newPosition;
     this.visitedPositions.add(newPosition);
+    // expose to shared data
+    this.sharedData.currentNode = newPosition as 'A'|'B'|'C'|'D';
+    this.updateOccupancyVector();
     
     // Handle people count changes based on position (only in final state)
     if (this.gameState === 3) {
       this.handlePeopleCountChange(newPosition);
+    }
+  }
+
+  private updateOccupancyVector() {
+    if (!this.sharedData.occupancyVector) return;
+    const group = this.sharedData.occupancyVector;
+    const counts = [
+      this.sharedData.roomCounts?.A || 0,
+      this.sharedData.roomCounts?.B || 0,
+      this.sharedData.roomCounts?.C || 0,
+      this.sharedData.roomCounts?.D || 0,
+      this.sharedData.hallwayCount || 0
+    ];
+    const children = group.getChildren();
+    let idx = 0;
+    for (const obj of children) {
+      if (obj.name && obj.name.startsWith('occ_')) {
+        const num = parseInt(obj.name.split('_')[1]);
+        (obj as Phaser.GameObjects.Text).setText(String(counts[num]));
+      }
+      idx++;
     }
   }
 
@@ -250,7 +299,9 @@ export class HallwaysScene extends Phaser.Scene {
     
     const prev = parseInt(this.sharedData.matrixInput.getValue(row, col)) || 0;
     let inc = 1;
-    if (typeof this.sharedData.peopleValue !== 'undefined') {
+    if (typeof this.sharedData.hallwayCount === 'number') {
+      inc = Math.max(0, this.sharedData.hallwayCount || 0);
+    } else if (typeof this.sharedData.peopleValue !== 'undefined') {
       const parsed = parseInt(this.sharedData.peopleValue);
       if (!isNaN(parsed) && parsed > 0) inc = parsed;
     }
@@ -327,6 +378,19 @@ export class HallwaysScene extends Phaser.Scene {
     playBtn.on('pointerdown', () => this.handlePlayButton());
     resetBtn.on('pointerdown', () => this.handleResetButton());
     validateBtn.on('pointerdown', () => this.handleValidateButton());
+
+    // Draw occupancy vector [A,B,C,D,Hall]
+    const vectorValues = [0,0,0,0, this.sharedData.hallwayCount || 0];
+    const group = this.add.group();
+    const baseX = 1500;
+    const baseY = 620;
+    const labels = ['A','B','C','D','Hall'];
+    for (let i = 0; i < 5; i++) {
+      const label = this.add.text(baseX - 30, baseY + i*30, labels[i], { font: '16px Arial', color: '#000' });
+      const val = this.add.text(baseX, baseY + i*30, String(vectorValues[i]), { font: '18px Arial', color: '#000' }).setName(`occ_${i}`);
+      group.addMultiple([label, val]);
+    }
+    this.sharedData.occupancyVector = group;
   }
 
   private handleNextButton() {

@@ -1,5 +1,30 @@
 import Image from "next/image";
 
+const SECTIONS = [
+  {
+    title: "Why I’m Proud of This Project",
+    items: [
+      "It combines software engineering with civic responsibility.",
+      "It uses real-world APIs and mapping tools to offer relevant data to users.",
+      "It was a team effort, with collaboration on design, development, and testing across multiple views and modules in Xcode.",
+      "Most importantly, it has potential for lifesaving impact, especially in areas vulnerable to frequent natural disasters.",
+    ],
+  },
+  {
+    title: "Challenges We Tackled",
+    items: [
+      "Scraping dynamic web content (Glassdoor) with strict anti-bot measures.",
+      "Transforming inconsistent salary data (hourly, yearly, K-format) into usable numbers.",
+      "Creating a responsive and minimal front end from scratch.",
+      "Hosting and maintaining a stable Flask site with scheduled scraping tasks.",
+      "Integrating ML models for salary prediction within the constraints of a student-led project.",
+    ],
+  },
+];
+
+const FINAL_THOUGHTS =
+  "This project taught me that meaningful software doesn’t have to be massive — it just needs to solve a real problem. Whether it’s showing a weather warning or directing someone to the nearest safe shelter, good software removes friction during critical moments.";
+
 export default function Blogs() {
   return (
     <div className="relative min-h-screen overflow-hidden">
@@ -111,27 +136,7 @@ export default function Blogs() {
           </div>
 
           {/* Additional Sections */}
-          {[
-            { title: "Why I’m Proud of This Project", items: [
-                "It combines software engineering with civic responsibility.",
-                "It uses real-world APIs and mapping tools to offer relevant data to users.",
-                "It was a team effort, with collaboration on design, development, and testing across multiple views and modules in Xcode.",
-                "Most importantly, it has potential for lifesaving impact, especially in areas vulnerable to frequent natural disasters."
-              ]
-            },
-            { title: "Challenges We Tackled", items: [
-                "Scraping dynamic web content (Glassdoor) with strict anti-bot measures.",
-                "Transforming inconsistent salary data (hourly, yearly, K-format) into usable numbers.",
-                "Creating a responsive and minimal front end from scratch.",
-                "Hosting and maintaining a stable Flask site with scheduled scraping tasks.",
-                "Integrating ML models for salary prediction within the constraints of a student-led project."
-              ]
-            },
-            { title: "Final Thoughts", items: [
-                "This project taught me that meaningful software doesn’t have to be massive — it just needs to solve a real problem. Whether it’s showing a weather warning or directing someone to the nearest safe shelter, good software removes friction during critical moments."
-              ]
-            }
-          ].map((section, idx) => (
+          {SECTIONS.map((section, idx) => (
             <div key={idx} className="mt-8">
               <div className="text-3xl md:text-6xl my-4 py-2 text-transparent bg-clip-text bg-gradient-to-r to-purple-600 from-sky-400">
                 {section.title}
@@ -143,6 +148,14 @@ export default function Blogs() {
               </ul>
             </div>
           ))}
+
+          {/* Final Thoughts as paragraph, not a list */}
+          <div className="mt-8">
+            <div className="text-3xl md:text-6xl my-4 py-2 text-transparent bg-clip-text bg-gradient-to-r to-purple-600 from-sky-400">
+              Final Thoughts
+            </div>
+            <p className="text-base md:text-[27px]/[1.7]">{FINAL_THOUGHTS}</p>
+          </div>
         </div>
       </div>
     </div>

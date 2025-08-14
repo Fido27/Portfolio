@@ -108,10 +108,10 @@ export const InfiniteMovingCards = ({
 						
 							<CardBody className="absolute">
 								<span className="mx-1">
-									<span className={"absolute z-30 text-xl inset-y-22 inset-y-20 transition-all duration-500 group-hover:inset-y-4"}>
+									<span className={"absolute z-30 text-2xl px-4 font-semibold inset-y-22 inset-y-20 transition-all duration-500 opacity-0 group-hover:opacity-100 group-hover:inset-y-4"}>
 										{item.title}
 									</span>
-									<span className={"absolute z-30 text-sm opacity-0 inset-y-36 transition-all duration-500 group-hover:opacity-100 group-hover:inset-y-12"}>
+									<span className={"absolute z-30 text-md px-4 opacity-0 inset-y-36 transition-all duration-500 group-hover:opacity-100 group-hover:inset-y-12"}>
 										{item.desc}
 									</span>
 								</span>
