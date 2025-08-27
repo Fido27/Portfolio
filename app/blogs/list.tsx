@@ -23,6 +23,14 @@ export const projList = [
         desc:"A weather app that provides disaster resilience information",
         bloglink: "/blogs/projects/disaster_resilience_weather_app"
     },
+
+    {   // 3
+        id: "tambola_ticket_generator" , 
+        src: "/blogs/projects/TambolaTicketsGenerator/blog-nail.png" , 
+        title: "Tambola Ticket Generator",
+        desc:"A program that generates custom tambola tickets for any design. Your imagination is the limit!",
+        bloglink: "/blogs/projects/TambolaTicketsGenerator"
+    },
 ]
 
 export const guideList = [

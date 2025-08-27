@@ -104,18 +104,19 @@ export const InfiniteMovingCards = ({
 									height={0}
 									width={1000}
 								/>
-							</Link>
 						
-							<CardBody className="absolute">
-								<span className="mx-1">
-									<span className={"absolute z-30 text-2xl px-4 font-semibold inset-y-22 inset-y-20 transition-all duration-500 opacity-0 group-hover:opacity-100 group-hover:inset-y-4"}>
-										{item.title}
-									</span>
-									<span className={"absolute z-30 text-md px-4 opacity-0 inset-y-36 transition-all duration-500 group-hover:opacity-100 group-hover:inset-y-12"}>
-										{item.desc}
-									</span>
-								</span>
-							</CardBody>
+							<CardBody className="absolute inset-0">
+									<div className="absolute inset-0 z-10 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none bg-black/25 backdrop-brightness-75"></div>
+									<div className="relative z-20 h-full w-full px-4 py-4 flex flex-col gap-2 opacity-0 transition-opacity duration-500 group-hover:opacity-100 pointer-events-none">
+										<div className="z-30 text-2xl font-semibold text-white drop-shadow-[0_2px_10px_rgba(0,0,0,0.7)] transform translate-y-4 group-hover:translate-y-0 transition-transform duration-500">
+											{item.title}
+										</div>
+										<div className="z-30 text-md text-white drop-shadow-[0_2px_8px_rgba(0,0,0,0.65)] transform translate-y-12 group-hover:translate-y-0 transition-transform duration-500 delay-100">
+											{item.desc}
+										</div>
+									</div>
+								</CardBody>
+							</Link>
 						</Card>
 					</li>
 				))}

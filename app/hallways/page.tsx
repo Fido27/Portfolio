@@ -1,10 +1,7 @@
 'use client';
 import dynamic from 'next/dynamic';
 
-const HallwaysGame = dynamic(
-  () => import('./gameController'),
-  { ssr: false }
-);
+const HallwaysGame = dynamic(() => import('./game').then(m => m.default), { ssr: false });
 
 export default function GamePage() {
   return (
