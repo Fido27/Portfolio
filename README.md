@@ -1,4 +1,4 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+This is a [Next.js](https://nextjs.org) project with a FastAPI backend.
 
 ## Getting Started
 
@@ -20,17 +20,33 @@ You can start editing the page by modifying `app/page.tsx`. The page auto-update
 
 This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
 
-## Learn More
+## Appwrite + FastAPI setup
 
-To learn more about Next.js, take a look at the following resources:
+1) Create a `.env` file at the project root with:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```
+# Appwrite (FastAPI)
+APPWRITE_ENDPOINT=
+APPWRITE_PROJECT=
+APPWRITE_API_KEY=
+APPWRITE_DATABASE_ID=
+APPWRITE_COLLECTION_ID=
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+# Frontend
+NEXT_PUBLIC_API_BASE=http://localhost:8000
+```
 
-## Deploy on Vercel
+2) Python server (one-time):
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+```
+python -m venv venv
+. venv/bin/activate
+pip install -r requirements.txt
+```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+3) Start both servers:
+
+```
+uvicorn app.api.main:app --reload --port 8000
+npm run dev
+```

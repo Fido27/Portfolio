@@ -344,37 +344,45 @@ export class HallwaysScene extends Phaser.Scene {
   private handleNextFromLevel1() {
     const input = this.dataBag.matrixInput;
     if (!input) return;
-    const isLevel1 = (this.stateManager.getCurrentId() || 1) === 1;
-    const target = isLevel1 ? [3, 3, 3, 0, 3] : [5, 5, 3, 2, 3];
+    const currentId = this.stateManager.getCurrentId() || 1;
+    const isLevel1 = currentId === 1;
+    const isLevel2 = currentId === 2;
+    const target = isLevel1 ? [3, 3, 3, 0, 3] : isLevel2 ? [5, 5, 3, 2, 3] : null;
     const actual: number[] = [];
     for (let i = 0; i < 5; i++) {
       const raw = (input.getValue(i, 0) || '0').toString();
       const n = parseInt(raw.replace(/[^0-9\-]/g, '') || '0', 10) || 0;
       actual.push(n);
     }
-    let hasGreater = false, hasLess = false;
-    for (let i = 0; i < 5; i++) {
-      if (actual[i] > target[i]) { hasGreater = true; break; }
-    }
-    if (!hasGreater) {
+
+    if (target) {
+      let hasGreater = false, hasLess = false;
       for (let i = 0; i < 5; i++) {
-        if (actual[i] < target[i]) { hasLess = true; break; }
+        if (actual[i] > target[i]) { hasGreater = true; break; }
+      }
+      if (!hasGreater) {
+        for (let i = 0; i < 5; i++) {
+          if (actual[i] < target[i]) { hasLess = true; break; }
+        }
+      }
+
+      if (hasGreater) {
+        alert('The circle traveled more than required.');
+        return;
+      }
+      if (hasLess) {
+        alert("The values don't match");
+        return;
       }
     }
 
-    if (hasGreater) {
-      alert('The circle traveled more than required.');
-      return;
-    }
-    if (hasLess) {
-      alert("The values don't match");
-      return;
-    }
-    // All match
+    // All match or free-play level (Level 3)
     if (isLevel1) {
-      // Reset matrix/diagram/timer before moving to next level
       this.resetGame();
       this.stateManager.change(2);
+    } else if (isLevel2) {
+      this.resetGame();
+      this.stateManager.change(3);
     } else {
       alert('Great job!');
     }

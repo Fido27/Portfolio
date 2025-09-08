@@ -21,6 +21,7 @@
     "daisyui": "latest",
     "motion": "^12.23.12",
     "next": "15.3.3",
+    "node-appwrite": "^18.0.0",
     "phaser": "^3.90.0",
     "phaser3-rex-plugins": "^1.80.16",
     "react": "^19.0.0",

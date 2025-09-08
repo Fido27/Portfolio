@@ -7,8 +7,8 @@ from fastapi.middleware.cors import CORSMiddleware
 import pandas as pd
 
 from app.api.linuxmancyclopedia import api as mancyclopedia
-
-df = pd.read_csv("app/api/nifty.csv")
+from app.api.clone import api as clone
+from app.api.worldclock import api as worldclock
 
 def start():
     started = "FastAPI is Success"
@@ -30,6 +30,8 @@ app.add_middleware(
 )
 
 app.include_router(mancyclopedia)
+app.include_router(clone)
+app.include_router(worldclock)
 # app.include_router(items.router)
 # app.include_router(
 #     admin.router,
@@ -42,19 +44,3 @@ app.include_router(mancyclopedia)
 @app.get("/")
 def root():
     return {"Hello": "World"}
-
-@app.get("/imf/")
-def logic(amount):
-    amount = int(amount)
-    row_index = random.randrange(1, len(df) - 248)
-    cp = df.iloc[row_index]["NIFTY"]
-    sp = df.iloc[row_index + 248]["NIFTY"]
-
-    gains = amount * (sp/cp)
-    gains_percent = ((gains - amount) / amount) * 100
-
-    return json.dumps({
-        "date" : df.iloc[row_index]["Date"],
-        "gains" : gains,
-        "gains_percent" : gains_percent,
-    })

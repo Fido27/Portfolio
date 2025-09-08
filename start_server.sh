@@ -3,10 +3,10 @@
 git pull
 
 # To directly run the servers
-# python -m venv venv
-# . venv/bin/activate
-# pip install -r requirements.txt
-# uvicorn app.api.main:app &
+python3 -m venv venv
+. venv/bin/activate
+pip3 install -r requirements.txt
+uvicorn app.api.main:app --reload &
 npm run dev
 # npm run build
 # npm run start
