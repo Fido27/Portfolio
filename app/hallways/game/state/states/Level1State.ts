@@ -17,13 +17,12 @@ export class Level1State implements GameState {
     this.setMatrixEnabled(false);
     this.enableArrows(true);
     this.resetPositionToStart();
-    // Initialize room populations to 5 each
-    this.data.roomCounts = { A: 4, B: 5, C: 5, D: 5 };
-    // Draw dots for each room to reflect populations
+    // Start with 5 people in each room
+    this.data.roomCounts = { A: 5, B: 5, C: 5, D: 5 };
     this.renderRoomDots();
-    // Initialize hallway people and update badge
-    this.data.hallwayCount = parseInt(this.data.peopleValue || '1') || 1;
-    this.updateHallwayBadge();
+    // Update occupancy vector on the scene
+    const sceneAny = this.scene as any;
+    if (typeof sceneAny.updateOccupancyVector === 'function') sceneAny.updateOccupancyVector();
 
     // Level-specific UI: hide matrix brackets, show labels C1-C5
     if ((this.data as any).matrixFrame) {
@@ -74,7 +73,7 @@ export class Level1State implements GameState {
       C: { x: 560, y: 240 },
       D: { x: 560, y: 560 }
     };
-    const start = coords['A'];
+    const start = (coords as any)['A'];
     this.data.greenCircle.setPosition(start.x, start.y);
     if (this.data.greenCircleText) this.data.greenCircleText.setPosition(start.x, start.y);
     this.data.currentNode = 'A';
@@ -98,18 +97,6 @@ export class Level1State implements GameState {
         sceneAny['__layoutRoomDots'](letter, count);
       }
     });
-  }
-
-  private updateHallwayBadge() {
-    const count = this.data.hallwayCount || 0;
-    if (!this.data.greenCircleText) return;
-    if (count > 1) {
-      this.data.greenCircleText.setText(String(count));
-      this.data.greenCircleText.setVisible(true);
-    } else {
-      this.data.greenCircleText.setText('');
-      this.data.greenCircleText.setVisible(false);
-    }
   }
 
   private drawVectorDisplay(values: (string|number)[]) {
@@ -154,9 +141,9 @@ export class Level1State implements GameState {
 
     // Re-render room dots to reflect current roomCounts
     this.renderRoomDots();
-
-    // Refresh hallway badge based on current hallwayCount
-    this.updateHallwayBadge();
+    // Refresh occupancy vector on reset
+    const sceneAny2 = this.scene as any;
+    if (typeof sceneAny2.updateOccupancyVector === 'function') sceneAny2.updateOccupancyVector();
   }
 }
 

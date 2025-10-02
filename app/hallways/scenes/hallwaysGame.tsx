@@ -14,6 +14,12 @@ export class HallwaysScene extends Phaser.Scene {
   private gameState: number = 0; // 0: main menu, 1: part (a), 2: part (b), 3: final input
   private currentPosition: string = 'A'; // Track current position of green circle
   private visitedPositions: Set<string> = new Set(); // Track which positions have been visited
+  // Pause/timer bookkeeping
+  private isPaused: boolean = false;
+  private baseElapsedMs: number = 0; // accumulated time before last resume
+  private resumeStartMs: number = 0; // timestamp when we last resumed
+  private pauseBtn?: Phaser.GameObjects.Text;
+  private pauseOverlay?: Phaser.GameObjects.Container;
 
   // Helper: Hallway node positions
   private nodeCoords = {
@@ -62,6 +68,8 @@ export class HallwaysScene extends Phaser.Scene {
 
   create() {
     this.startTime = this.time.now;
+    this.resumeStartMs = this.time.now;
+    this.baseElapsedMs = 0;
     this.timerText = this.add.text(10, 10, '00:00', {
       font: '20px Arial',
       color: '#000'
@@ -98,8 +106,121 @@ export class HallwaysScene extends Phaser.Scene {
     // Set up game control buttons
     this.setupGameControls();
 
+    // Set up pause UI
+    this.setupPauseUI();
+
     // Start with sandbox state
     this.gameStateManager.changeState(0);
+  }
+
+  private setupPauseUI() {
+    const { width } = this.scale;
+    // Top-right pause button
+    this.pauseBtn = this.add.text(width - 10, 54, 'Pause', {
+      font: '20px Arial',
+      color: '#fff',
+      backgroundColor: '#333',
+      padding: { left: 12, right: 12, top: 6, bottom: 6 },
+      align: 'center',
+      fontStyle: 'bold'
+    }).setOrigin(1, 0).setDepth(4000).setInteractive({ useHandCursor: true });
+
+    this.pauseBtn.on('pointerdown', () => {
+      if (this.isPaused) {
+        this.resumeGame();
+      } else {
+        this.pauseGame();
+      }
+    });
+
+    // ESC to toggle pause
+    this.input.keyboard?.on('keydown-ESC', () => {
+      if (this.isPaused) this.resumeGame(); else this.pauseGame();
+    });
+  }
+
+  private buildPauseOverlay() {
+    const { width, height } = this.scale;
+    const overlay = this.add.container(0, 0);
+
+    // Dim background intercepting input
+    const dim = this.add.rectangle(0, 0, width, height, 0x000000, 0.35)
+      .setOrigin(0, 0)
+      .setInteractive({ useHandCursor: false });
+    overlay.add(dim);
+
+    // Right-side menu panel
+    const panelWidth = 420;
+    const panel = this.add.rectangle(width - panelWidth, 0, panelWidth, height, 0xffffff, 1)
+      .setOrigin(0, 0)
+      .setStrokeStyle(2, 0x000000);
+    overlay.add(panel);
+
+    const title = this.add.text(width - panelWidth + 24, 24, 'Paused', { font: '28px Arial', color: '#000' });
+    overlay.add(title);
+
+    const info = this.add.text(width - panelWidth + 24, 70,
+      'Game is paused. Use the buttons below.\n\n- Resume to continue\n- Reset to restart current step\n- Level Select to jump to a section',
+      { font: '18px Arial', color: '#222', wordWrap: { width: panelWidth - 48 } }
+    );
+    overlay.add(info);
+
+    // Buttons on panel
+    const btnYStart = 220;
+    const makeBtn = (y: number, label: string, bg: number, onClick: () => void) => {
+      const btn = this.add.text(width - panelWidth + 24, y, label, {
+        font: '22px Arial', color: '#fff', backgroundColor: `#${bg.toString(16).padStart(6,'0')}`,
+        padding: { left: 16, right: 16, top: 8, bottom: 8 }
+      }).setInteractive({ useHandCursor: true });
+      btn.on('pointerdown', onClick);
+      overlay.add(btn);
+      return btn;
+    };
+
+    makeBtn(btnYStart, 'Resume', 0x2e7d32, () => this.resumeGame());
+    makeBtn(btnYStart + 60, 'Reset', 0x616161, () => { this.handleResetButton(); });
+
+    // Level select section
+    const lvlTitle = this.add.text(width - panelWidth + 24, btnYStart + 130, 'Level Select', { font: '20px Arial', color: '#000' });
+    overlay.add(lvlTitle);
+    const levels = [ {label: 'Sandbox', id: 0}, {label: '(a)', id: 1}, {label: '(b)', id: 2}, {label: 'Final', id: 3} ];
+    levels.forEach((lvl, i) => {
+      const lbtn = this.add.text(width - panelWidth + 24, btnYStart + 170 + i*40, lvl.label, {
+        font: '20px Arial', color: '#0077cc'
+      }).setInteractive({ useHandCursor: true });
+      lbtn.on('pointerdown', () => {
+        this.gameState = lvl.id;
+        this.gameStateManager.changeState(lvl.id);
+        this.visitedPositions.clear();
+        this.resumeGame();
+      });
+      overlay.add(lbtn);
+    });
+
+    overlay.setDepth(3500);
+    overlay.setVisible(false);
+    this.pauseOverlay = overlay;
+  }
+
+  private pauseGame() {
+    if (this.isPaused) return;
+    this.isPaused = true;
+    // accumulate elapsed so far
+    this.baseElapsedMs += this.time.now - this.resumeStartMs;
+    // pause tweens/time-based animations
+    this.tweens.pauseAll();
+    if (!this.pauseOverlay) this.buildPauseOverlay();
+    this.pauseOverlay!.setVisible(true);
+    this.pauseBtn?.setText('Resume');
+  }
+
+  private resumeGame() {
+    if (!this.isPaused) return;
+    this.isPaused = false;
+    this.resumeStartMs = this.time.now;
+    this.tweens.resumeAll();
+    this.pauseOverlay?.setVisible(false);
+    this.pauseBtn?.setText('Pause');
   }
 
   private createUIElements() {
@@ -532,7 +653,11 @@ export class HallwaysScene extends Phaser.Scene {
   }
 
   update(time: number) {
-    const elapsed = time - this.startTime;
+    // Timer respects pause: baseElapsedMs + (now - resumeStartMs when not paused)
+    let elapsed = this.baseElapsedMs;
+    if (!this.isPaused) {
+      elapsed += (time - this.resumeStartMs);
+    }
     const totalSec = Math.floor(elapsed / 1000);
     const mins = Math.floor(totalSec / 60);
     const secs = totalSec % 60;

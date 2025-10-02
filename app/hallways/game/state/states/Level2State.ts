@@ -11,9 +11,17 @@ export class Level2State implements GameState {
     this.setMatrixEnabled(false);
     this.enableArrows(true);
     this.resetPositionToStart();
+    // Level 2: start with 5 in each room
+    this.data.roomCounts = { A: 5, B: 5, C: 5, D: 5 };
+    const sceneAny = this.scene as any;
+    if (sceneAny && typeof sceneAny['__layoutRoomDots'] === 'function') {
+      (['A','B','C','D'] as ('A'|'B'|'C'|'D')[]).forEach(l => sceneAny['__layoutRoomDots'](l, this.data.roomCounts?.[l] || 0));
+    }
     // Keep labels C1-C5 visible; hide matrix brackets
     if ((this.data as any).matrixFrame) (this.data as any).matrixFrame.setVisible(false);
     if ((this.data as any).matrixLabels) ((this.data as any).matrixLabels as Phaser.GameObjects.Text[]).forEach(l => l.setVisible(true));
+    // Update occupancy vector on the scene
+    if (typeof sceneAny.updateOccupancyVector === 'function') sceneAny.updateOccupancyVector();
   }
 
   exit(): void {
@@ -48,7 +56,7 @@ export class Level2State implements GameState {
       C: { x: 560, y: 240 },
       D: { x: 560, y: 560 }
     };
-    const start = coords['A'];
+    const start = (coords as any)['A'];
     this.data.greenCircle.setPosition(start.x, start.y);
     if (this.data.greenCircleText) this.data.greenCircleText.setPosition(start.x, start.y);
     this.data.currentNode = 'A';

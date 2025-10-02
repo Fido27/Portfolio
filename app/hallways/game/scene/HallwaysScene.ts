@@ -9,6 +9,12 @@ export class HallwaysScene extends Phaser.Scene {
   private timerText!: Phaser.GameObjects.Text;
   private infoOverlay?: Phaser.GameObjects.Text;
   private isAnimating: boolean = false;
+  // pause support
+  private isPaused: boolean = false;
+  private baseElapsedMs: number = 0;
+  private resumeStartMs: number = 0;
+  private pauseBtn?: Phaser.GameObjects.Text;
+  private pauseOverlay?: Phaser.GameObjects.Container;
 
   private nodeCoords: Record<NodeKey, {x:number;y:number}> = {
     A: { x: 240, y: 560 },
@@ -34,6 +40,8 @@ export class HallwaysScene extends Phaser.Scene {
 
   create() {
     this.startTime = this.time.now;
+    this.resumeStartMs = this.time.now;
+    this.baseElapsedMs = 0;
     this.timerText = this.add.text(10, 10, '00:00', { font: '20px Arial', color: '#000' }).setOrigin(0, 0);
 
     // shared data
@@ -41,7 +49,6 @@ export class HallwaysScene extends Phaser.Scene {
       selectedStart: 'A',
       selectedDest: 'A',
       peopleValue: '1',
-      hallwayCount: 1,
       roomCounts: { A: 0, B: 0, C: 0, D: 0 },
       currentNode: 'A'
     };
@@ -52,13 +59,28 @@ export class HallwaysScene extends Phaser.Scene {
     this.createControls();
     // (Removed) occupancy vector UI
 
-    // state manager: start at Level 1
+    // state manager: start at Sandbox (0)
     this.stateManager = new StateManager(this, this.dataBag);
-    this.stateManager.change(1);
+    this.stateManager.change(0);
+
+    // Occupancy vector UI [A,B,C,D]
+    const vectorValues = [0,0,0,0];
+    const group = this.add.group();
+    const baseX = 1500; const baseY = 620; const labels = ['A','B','C','D'];
+    for (let i = 0; i < 4; i++) {
+      const label = this.add.text(baseX - 30, baseY + i*30, labels[i], { font: '16px Arial', color: '#000' });
+      const val = this.add.text(baseX, baseY + i*30, String(vectorValues[i]), { font: '18px Arial', color: '#000' }).setName(`occ_${i}`);
+      group.addMultiple([label, val]);
+    }
+    this.dataBag.occupancyVector = group;
+
+    // Pause UI
+    this.setupPauseUI();
   }
 
   update(time: number) {
-    const elapsed = time - this.startTime;
+    let elapsed = this.baseElapsedMs;
+    if (!this.isPaused) elapsed += (time - this.resumeStartMs);
     const totalSec = Math.floor(elapsed / 1000);
     const mins = Math.floor(totalSec / 60);
     const secs = totalSec % 60;
@@ -88,9 +110,11 @@ export class HallwaysScene extends Phaser.Scene {
       const texKey = `box-${letter}`;
       g.generateTexture(texKey, 120, 120);
       g.clear();
-      const pos = letter==='A'? {x:150,y:650+dy} : letter==='B'? {x:150,y:150+dy} : letter==='C'? {x:650,y:150+dy} : {x:650,y:650+dy};
+      // Move rooms slightly toward the center so their outer corner reaches halfway into the hallway
+      const pos = letter==='A'? {x:200,y:600+dy} : letter==='B'? {x:200,y:200+dy} : letter==='C'? {x:600,y:200+dy} : {x:600,y:600+dy};
       this.add.image(pos.x, pos.y, texKey).setAngle(45);
-      this.add.text(pos.x, pos.y, `${letter}\n${text}`, { font: '20px Arial', color: '#000' }).setOrigin(0.5).setAlign('center');
+      // Lift the text higher within the diamond
+      this.add.text(pos.x, pos.y - 24, `${letter}\n${text}`, { font: '20px Arial', color: '#000' }).setOrigin(0.5).setAlign('center');
     };
     drawSquare(0x7da0f7,'A','Art');      // brighter blue
     drawSquare(0xff7070,'B','Biology');  // vibrant coral-red
@@ -105,9 +129,14 @@ export class HallwaysScene extends Phaser.Scene {
     g.strokeTriangleShape(wall2);
 
     // helper to place small dots representing room populations
-    const getRoomCenter = (letter: 'A'|'B'|'C'|'D') => {
-      return letter==='A'? { x: 150, y: 650 + dy } : letter==='B'? { x: 150, y: 150 + dy } : letter==='C'? { x: 650, y: 150 + dy } : { x: 650, y: 650 + dy };
-    };
+    const roomCenters = {
+      A: { x: 200, y: 600 + dy },
+      B: { x: 200, y: 200 + dy },
+      C: { x: 600, y: 200 + dy },
+      D: { x: 600, y: 600 + dy }
+    } as const;
+    this.dataBag.roomCenters = roomCenters as any;
+    const getRoomCenter = (letter: 'A'|'B'|'C'|'D') => (roomCenters as any)[letter];
     const ensureRoomGroup = (letter: 'A'|'B'|'C'|'D') => {
       if (!this.dataBag.roomDots) this.dataBag.roomDots = {} as any;
       const groups = this.dataBag.roomDots as Record<'A'|'B'|'C'|'D', Phaser.GameObjects.Group | undefined>;
@@ -124,7 +153,8 @@ export class HallwaysScene extends Phaser.Scene {
         const r = Math.floor(i / perRow);
         const c = i % perRow;
         const dxDot = (c - (perRow - 1) / 2) * 16;
-        const dyDot = (r - 1) * 16;
+        // Push dots lower within the diamond (further from the text)
+        const dyDot = (r - 1) * 16 + 24;
         const dot = this.add.circle(center.x + dxDot, center.y + dyDot, 6, 0x2ecc40);
         group.add(dot);
       }
@@ -154,8 +184,10 @@ export class HallwaysScene extends Phaser.Scene {
       center: this.add.image(400, 400 + dy, 'red_arrow').setScale(0.3).setAngle(135).setInteractive({ useHandCursor: true })
     };
 
-    const greenCircle = this.add.circle(this.nodeCoords.A.x, this.nodeCoords.A.y, 18, 0x2ecc40);
+    const greenCircle = this.add.circle(this.nodeCoords.A.x, this.nodeCoords.A.y, 14, 0x2ecc40);
+    // ensure no badge text is displayed (no hallway count)
     const greenText = this.add.text(this.nodeCoords.A.x, this.nodeCoords.A.y, '', { font: '16px Arial', color: '#fff' }).setOrigin(0.5);
+    greenText.setVisible(false);
     
     this.dataBag.arrows = arrows;
     this.dataBag.greenCircle = greenCircle as any;
@@ -171,28 +203,24 @@ export class HallwaysScene extends Phaser.Scene {
       }});
     };
 
-    const isAt = (p:{x:number;y:number}) => Math.abs(greenCircle.x - p.x) < 2 && Math.abs(greenCircle.y - p.y) < 2;
+    const handleArrow = (from: NodeKey, to: NodeKey, camIdx: number) => {
+      // Always increment the corresponding camera count
+      this.incrementMatrixValue(camIdx);
+      // If the green circle is at the arrow's source, move it; otherwise just transfer people
+      if ((this.dataBag.currentNode || 'A') === from) {
+        this.transferOne(from, to);
+        moveTo(to);
+      } else {
+        this.transferOne(from, to);
+      }
+    };
 
-    arrows.left.on('pointerdown', () => {
-      const atA = isAt((this.dataBag.nodeCoords || this.nodeCoords).A);
-      if (atA) { this.incrementMatrixValue(0); moveTo('B'); }
-    });
-    arrows.top.on('pointerdown', () => {
-      const atB = isAt((this.dataBag.nodeCoords || this.nodeCoords).B);
-      if (atB) { this.incrementMatrixValue(1); moveTo('C'); }
-    });
-    arrows.right.on('pointerdown', () => {
-      const atC = isAt((this.dataBag.nodeCoords || this.nodeCoords).C);
-      if (atC) { this.incrementMatrixValue(2); moveTo('D'); }
-    });
-    arrows.bottom.on('pointerdown', () => {
-      const atD = isAt((this.dataBag.nodeCoords || this.nodeCoords).D);
-      if (atD) { this.incrementMatrixValue(4); moveTo('A'); }
-    });
-    arrows.center.on('pointerdown', () => {
-      const atC = isAt((this.dataBag.nodeCoords || this.nodeCoords).C);
-      if (atC) { this.incrementMatrixValue(3); moveTo('A'); }
-    });
+    // Map each arrow to its hallway edge
+    arrows.left.on('pointerdown', () => handleArrow('A', 'B', 0));   // C1: A -> B
+    arrows.top.on('pointerdown', () => handleArrow('B', 'C', 1));    // C2: B -> C
+    arrows.right.on('pointerdown', () => handleArrow('C', 'D', 2));  // C3: C -> D
+    arrows.center.on('pointerdown', () => handleArrow('C', 'A', 3)); // C4: C -> A
+    arrows.bottom.on('pointerdown', () => handleArrow('D', 'A', 4)); // C5: D -> A
   }
 
   private createMatrixInput() {
@@ -260,21 +288,9 @@ export class HallwaysScene extends Phaser.Scene {
       this.handleNextFromLevel1();
     });
 
-    // Top-right Info and Reset buttons
-    const buttonStyle = { font: '22px Arial', color: '#fff', backgroundColor: '#333', padding: { left: 12, right: 12, top: 6, bottom: 6 }, align: 'center', fontStyle: 'bold' } as Phaser.Types.GameObjects.Text.TextStyle;
-    const resetBtn = this.add.text(width - 20, 20, 'Reset', buttonStyle).setOrigin(1, 0).setInteractive({ useHandCursor: true });
-    const infoBtn = this.add.text(resetBtn.x - resetBtn.width - 12, 20, 'Info', buttonStyle).setOrigin(1, 0).setInteractive({ useHandCursor: true });
+    // Removed always-visible Info/Reset per request. They appear in Pause menu.
 
-    infoBtn.on('pointerdown', () => {
-      this.infoOverlay?.destroy();
-      const message = 'Click on the arrows to move the green circle and fill the matrix';
-      this.infoOverlay = this.add.text(width - 20, 60, message, { font: '18px Arial', color: '#fff', backgroundColor: '#333', wordWrap: { width: 520 } }).setOrigin(1, 0);
-      this.time.delayedCall(4000, () => { this.infoOverlay?.destroy(); this.infoOverlay = undefined; });
-    });
-
-    resetBtn.on('pointerdown', () => {
-      this.resetGame();
-    });
+    // (Sandbox quick-return button removed per request)
 
     // Animate button (below diagram, centered)
     const dy = this.scale.height / 2 - 400;
@@ -301,8 +317,13 @@ export class HallwaysScene extends Phaser.Scene {
     const input = this.dataBag.matrixInput;
     if (!input) return;
     const prev = parseInt(input.getValue(row, 0) || '0') || 0;
-    const inc = Math.max(0, this.dataBag.hallwayCount || 0) || 1;
+    const inc = 1;
     input.setValue(row, 0, String(prev + inc));
+    // Notify level state (e.g., Level 5) that matrix changed, so it can recompute results
+    const current = this.stateManager.getCurrent() as any;
+    if (current && typeof current.onMatrixUpdated === 'function') {
+      current.onMatrixUpdated();
+    }
   }
 
   private resetGame() {
@@ -319,11 +340,12 @@ export class HallwaysScene extends Phaser.Scene {
           }
         }
       }
-      const coords = this.dataBag.nodeCoords || { A: { x: 240, y: 560 } as any };
-      const start = (coords as any)['A'];
+      const coords = this.dataBag.nodeCoords || { A: { x: 240, y: 560 } as any, B:{x:240,y:240} as any, C:{x:560,y:240} as any, D:{x:560,y:560} as any };
+      const startKey = (this.dataBag.selectedStart || 'A') as 'A'|'B'|'C'|'D';
+      const start = (coords as any)[startKey];
       if (this.dataBag.greenCircle && start) {
         this.dataBag.greenCircle.setPosition(start.x, start.y);
-        this.dataBag.currentNode = 'A';
+        this.dataBag.currentNode = startKey;
       }
       if (this.dataBag.greenCircleText && start) this.dataBag.greenCircleText.setPosition(start.x, start.y);
       // Re-render room dots if helper exists
@@ -334,19 +356,25 @@ export class HallwaysScene extends Phaser.Scene {
           sceneAny['__layoutRoomDots'](letter, count);
         });
       }
+      // Update occupancy vector values
+      this.updateOccupancyVector();
     }
 
     // Reset timer
     this.startTime = this.time.now;
+    this.baseElapsedMs = 0;
+    this.resumeStartMs = this.time.now;
     this.timerText.setText('00:00');
   }
 
   private handleNextFromLevel1() {
     const input = this.dataBag.matrixInput;
     if (!input) return;
-    const currentId = this.stateManager.getCurrentId() || 1;
+    const currentId = this.stateManager.getCurrentId() ?? 0;
+    const isSandbox = currentId === 0;
     const isLevel1 = currentId === 1;
     const isLevel2 = currentId === 2;
+    const isLevel3 = currentId === 3;
     const target = isLevel1 ? [3, 3, 3, 0, 3] : isLevel2 ? [5, 5, 3, 2, 3] : null;
     const actual: number[] = [];
     for (let i = 0; i < 5; i++) {
@@ -355,7 +383,7 @@ export class HallwaysScene extends Phaser.Scene {
       actual.push(n);
     }
 
-    if (target) {
+    if (target && !isSandbox) {
       let hasGreater = false, hasLess = false;
       for (let i = 0; i < 5; i++) {
         if (actual[i] > target[i]) { hasGreater = true; break; }
@@ -376,16 +404,106 @@ export class HallwaysScene extends Phaser.Scene {
       }
     }
 
-    // All match or free-play level (Level 3)
-    if (isLevel1) {
+    // Progression with validation for Level 3
+    if (isSandbox) {
+      this.resetGame();
+      this.stateManager.change(1);
+    } else if (isLevel1) {
       this.resetGame();
       this.stateManager.change(2);
     } else if (isLevel2) {
       this.resetGame();
       this.stateManager.change(3);
+    } else if (isLevel3) {
+      // Validate: end at D
+      const cVals: number[] = [0,0,0,0,0];
+      for (let i = 0; i < 5; i++) {
+        const raw = (input.getValue(i, 0) || '0').toString();
+        const sanitized = raw.replace(/[^0-9\-]/g, '');
+        cVals[i] = parseInt(sanitized || '0', 10) || 0;
+      }
+      const startNode = (this.dataBag.selectedStart || 'A') as NodeKey;
+      const path = this.simulateHallwayPath(startNode, cVals);
+      const finalNode = path[path.length - 1];
+      if (finalNode !== 'D') {
+        alert('Not quite yet — end at Drama (D) to proceed.');
+        return;
+      }
+      this.resetGame();
+      this.stateManager.change(4);
     } else {
       alert('Great job!');
     }
+  }
+
+  // ===== Pause UI =====
+  private setupPauseUI() {
+    const { width } = this.scale;
+    this.pauseBtn = this.add.text(width - 10, 10, 'Pause', {
+      font: '20px Arial', color: '#fff', backgroundColor: '#333',
+      padding: { left: 12, right: 12, top: 6, bottom: 6 }, align: 'center', fontStyle: 'bold'
+    }).setOrigin(1, 0).setDepth(4000).setInteractive({ useHandCursor: true });
+
+    this.pauseBtn.on('pointerdown', () => { this.isPaused ? this.resumeGame() : this.pauseGame(); });
+    this.input.keyboard?.on('keydown-ESC', () => { this.isPaused ? this.resumeGame() : this.pauseGame(); });
+  }
+
+  private buildPauseOverlay() {
+    const { width, height } = this.scale;
+    const overlay = this.add.container(0, 0);
+    const dim = this.add.rectangle(0, 0, width, height, 0x000000, 0.35).setOrigin(0, 0).setInteractive();
+    overlay.add(dim);
+
+    const panelWidth = 460;
+    const panel = this.add.rectangle(width - panelWidth, 0, panelWidth, height, 0xffffff, 1).setOrigin(0, 0).setStrokeStyle(2, 0x000000);
+    overlay.add(panel);
+    const title = this.add.text(width - panelWidth + 24, 24, 'Paused', { font: '28px Arial', color: '#000' });
+    overlay.add(title);
+
+    const infoText = 'Click the red arrows to move the green circle. Each time the circle crosses a security camera, that camera increments its counter. Use the inputs to set C1–C5 or click arrows to build the matrix.';
+    const info = this.add.text(width - panelWidth + 24, 70, infoText, { font: '18px Arial', color: '#222', wordWrap: { width: panelWidth - 48 } });
+    overlay.add(info);
+
+    const makeBtn = (y:number, label:string, bg:number, onClick:() => void) => {
+      const btn = this.add.text(width - panelWidth + 24, y, label, { font: '22px Arial', color: '#fff', backgroundColor: `#${bg.toString(16).padStart(6,'0')}`, padding: { left: 16, right: 16, top: 8, bottom: 8 } }).setInteractive({ useHandCursor: true });
+      btn.on('pointerdown', onClick);
+      overlay.add(btn);
+      return btn;
+    };
+    makeBtn(220, 'Resume', 0x2e7d32, () => this.resumeGame());
+    makeBtn(280, 'Reset', 0x616161, () => this.resetGame());
+
+    const lvlTitle = this.add.text(width - panelWidth + 24, 350, 'Level Select', { font: '20px Arial', color: '#000' });
+    overlay.add(lvlTitle);
+    const levels = [ {label:'Sandbox', id:0}, {label:'Level 1', id:1}, {label:'Level 2', id:2}, {label:'Level 3', id:3}, {label:'Level 4', id:4}, {label:'Level 5', id:5}, {label:'Level 6', id:6} ];
+    levels.forEach((lvl, i) => {
+      const lbtn = this.add.text(width - panelWidth + 24, 390 + i*40, lvl.label, { font: '20px Arial', color: '#0077cc' }).setInteractive({ useHandCursor: true });
+      lbtn.on('pointerdown', () => { this.resetGame(); this.stateManager.change(lvl.id); this.resumeGame(); });
+      overlay.add(lbtn);
+    });
+
+    overlay.setDepth(3500);
+    overlay.setVisible(false);
+    this.pauseOverlay = overlay;
+  }
+
+  private pauseGame() {
+    if (this.isPaused) return;
+    this.isPaused = true;
+    this.baseElapsedMs += this.time.now - this.resumeStartMs;
+    this.tweens.pauseAll();
+    if (!this.pauseOverlay) this.buildPauseOverlay();
+    this.pauseOverlay!.setVisible(true);
+    this.pauseBtn?.setText('Resume');
+  }
+
+  private resumeGame() {
+    if (!this.isPaused) return;
+    this.isPaused = false;
+    this.resumeStartMs = this.time.now;
+    this.tweens.resumeAll();
+    this.pauseOverlay?.setVisible(false);
+    this.pauseBtn?.setText('Pause');
   }
 
   private simulateHallwayPath(start: NodeKey, matrix: number[]): NodeKey[] {
@@ -436,6 +554,47 @@ export class HallwaysScene extends Phaser.Scene {
       guard++;
     }
     return path;
+  }
+
+  // Move one student from room "from" to room "to" with a small dot animation
+  private transferOne(from: NodeKey, to: NodeKey) {
+    const counts = this.dataBag.roomCounts || { A:0, B:0, C:0, D:0 };
+    // Default: move 1. If current state is Level 5, move 2.
+    const currentId = this.stateManager.getCurrentId?.() ?? null;
+    const delta = currentId === 5 ? 2 : 1;
+    if ((counts as any)[from] > 0) {
+      (counts as any)[from] = Math.max(0, (counts as any)[from] - delta);
+      (counts as any)[to] = ((counts as any)[to] || 0) + delta;
+      this.dataBag.roomCounts = counts as any;
+
+      // Refresh dots layout if helper exists
+      const sceneAny = this as any;
+      if (sceneAny && typeof sceneAny['__layoutRoomDots'] === 'function') {
+        ['A','B','C','D'].forEach((letter) => {
+          const count = (this.dataBag.roomCounts as any)?.[letter] || 0;
+          sceneAny['__layoutRoomDots'](letter, count);
+        });
+      }
+      this.updateOccupancyVector();
+    }
+  }
+
+  private updateOccupancyVector() {
+    const group = this.dataBag.occupancyVector;
+    if (!group) return;
+    const counts = [
+      this.dataBag.roomCounts?.A || 0,
+      this.dataBag.roomCounts?.B || 0,
+      this.dataBag.roomCounts?.C || 0,
+      this.dataBag.roomCounts?.D || 0
+    ];
+    const children = group.getChildren();
+    for (const obj of children) {
+      if (obj.name && obj.name.startsWith('occ_')) {
+        const idx = parseInt((obj.name.split('_')[1]) as any);
+        (obj as Phaser.GameObjects.Text).setText(String(counts[idx]));
+      }
+    }
   }
 
   private async handleAnimateButton() {
@@ -489,7 +648,9 @@ export class HallwaysScene extends Phaser.Scene {
     }
     this.isAnimating = true;
     for (let i = 1; i < path.length; i++) {
-      const target = (this.dataBag.nodeCoords || this.nodeCoords)[path[i]];
+      const from = path[i - 1] as NodeKey;
+      const to = path[i] as NodeKey;
+      const target = (this.dataBag.nodeCoords || this.nodeCoords)[to];
       await new Promise<void>((resolve) => {
         this.tweens.add({
           targets: text ? [circle, text] : [circle],
@@ -497,7 +658,7 @@ export class HallwaysScene extends Phaser.Scene {
           y: target.y,
           duration: 600,
           ease: 'Power2',
-          onComplete: () => resolve()
+          onComplete: () => { this.transferOne(from, to); resolve(); }
         });
       });
     }

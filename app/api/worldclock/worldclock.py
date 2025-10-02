@@ -7,7 +7,7 @@ from appwrite.services.databases import Databases
 from appwrite.query import Query
 
 
-api = APIRouter(prefix="/WorldClock", tags=["WorldClock"])
+api = APIRouter(prefix="/Admin", tags=["Admin"])
 
 
 def _db() -> Databases:

@@ -24,14 +24,28 @@ export interface SharedData {
   greenCircleText?: Phaser.GameObjects.Text;
   arrows?: { [key: string]: Phaser.GameObjects.GameObject };
   occupancyVector?: Phaser.GameObjects.Group;
+  // Sandbox UI elements
+  sandboxContainer?: Phaser.GameObjects.Container;
+  peopleCellText?: Phaser.GameObjects.Text;
+  roomPeopleTexts?: { A?: Phaser.GameObjects.Text; B?: Phaser.GameObjects.Text; C?: Phaser.GameObjects.Text; D?: Phaser.GameObjects.Text };
+  roomPeopleRects?: { A?: Phaser.GameObjects.Rectangle; B?: Phaser.GameObjects.Rectangle; C?: Phaser.GameObjects.Rectangle; D?: Phaser.GameObjects.Rectangle };
+  // Save Presets UI elements
+  saveUIContainer?: Phaser.GameObjects.Container;
+  saveButton?: Phaser.GameObjects.Text;
+  saveSlots?: Phaser.GameObjects.Container[];
+  savedMatrices?: number[][]; // per-slot saved 5x1 vectors
+  saveModeActive?: boolean;
   selectedStart: NodeKey | null;
   selectedDest: NodeKey | null;
   peopleValue: string;
-  hallwayCount: number;
   roomCounts: { A: number; B: number; C: number; D: number };
   currentNode: NodeKey;
   nodeCoords?: Record<NodeKey, { x: number; y: number }>;
+  roomCenters?: Record<NodeKey, { x: number; y: number }>;
   roomDots?: { [key in NodeKey]?: Phaser.GameObjects.Group };
+  // Toggles
+  inputMatrixEnabled?: boolean;
+  arrowsEnabled?: boolean;
 }
 
 export interface GameState {

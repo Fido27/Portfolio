@@ -8,7 +8,8 @@ import pandas as pd
 
 from app.api.linuxmancyclopedia import api as mancyclopedia
 from app.api.clone import api as clone
-from app.api.worldclock import api as worldclock
+from app.api.worldclock.worldclock import api as worldclock
+from app.api.worldclock.admin.admin import api as admin
 
 def start():
     started = "FastAPI is Success"
@@ -32,6 +33,7 @@ app.add_middleware(
 app.include_router(mancyclopedia)
 app.include_router(clone)
 app.include_router(worldclock)
+app.include_router(admin)
 # app.include_router(items.router)
 # app.include_router(
 #     admin.router,

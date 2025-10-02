@@ -10,20 +10,16 @@ export class Level3State implements GameState {
     this.showPrompt();
     this.setMatrixEnabled(false);
     this.enableArrows(true);
-
-    // Configure level-specific parameters
+    // Level 3: start with 5 people in each room
     this.data.selectedStart = 'A';
     this.data.selectedDest = 'D';
-    this.data.peopleValue = '2';
-    this.data.hallwayCount = 2;
-    this.updateHallwayBadge();
-
-    // Room populations: [A,B,C,D] = [3,5,5,5]
-    this.data.roomCounts = { A: 3, B: 5, C: 5, D: 5 };
+    this.data.roomCounts = { A: 5, B: 5, C: 5, D: 5 };
     this.renderRoomDots();
-
     // Reset player position to start
     this.resetPositionToStart();
+    // Update occupancy vector on the scene
+    const sceneAny = this.scene as any;
+    if (typeof sceneAny.updateOccupancyVector === 'function') sceneAny.updateOccupancyVector();
 
     // Keep labels C1-C5 visible; hide matrix brackets
     if ((this.data as any).matrixFrame) (this.data as any).matrixFrame.setVisible(false);
@@ -54,8 +50,9 @@ export class Level3State implements GameState {
     // Re-render room dots
     this.renderRoomDots();
 
-    // Refresh hallway badge
-    this.updateHallwayBadge();
+    // Refresh occupancy vector
+    const sceneAny2 = this.scene as any;
+    if (typeof sceneAny2.updateOccupancyVector === 'function') sceneAny2.updateOccupancyVector();
   }
 
   private setMatrixEnabled(enabled: boolean) {
@@ -84,7 +81,7 @@ export class Level3State implements GameState {
       C: { x: 560, y: 240 },
       D: { x: 560, y: 560 }
     };
-    const start = coords['A'];
+    const start = (coords as any)['A'];
     this.data.greenCircle.setPosition(start.x, start.y);
     if (this.data.greenCircleText) this.data.greenCircleText.setPosition(start.x, start.y);
     this.data.currentNode = 'A';
@@ -108,17 +105,8 @@ export class Level3State implements GameState {
     });
   }
 
-  private updateHallwayBadge() {
-    const count = this.data.hallwayCount || 0;
-    if (!this.data.greenCircleText) return;
-    if (count > 1) {
-      this.data.greenCircleText.setText(String(count));
-      this.data.greenCircleText.setVisible(true);
-    } else {
-      this.data.greenCircleText.setText('');
-      this.data.greenCircleText.setVisible(false);
-    }
-  }
+  // hallway badge removed in levels; no hallway mechanic
+  private updateHallwayBadge() {}
 }
 
 
