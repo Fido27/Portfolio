@@ -17,8 +17,8 @@ export class Level7State implements GameState {
     // Hide the default 5x1 input cells so we don't see extra cells
     this.toggleDefaultMatrixVisible(false);
 
-    // Default people per room: 5
-    this.data.roomCounts = { A: 5, B: 5, C: 5, D: 5 };
+    // Default people per room: 8
+    this.data.roomCounts = { A: 8, B: 8, C: 8, D: 8 };
     this.renderRoomDots();
     this.resetPositionToStart();
 

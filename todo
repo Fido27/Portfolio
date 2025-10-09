@@ -1,0 +1,20 @@
+TODO:
+    - Reset is not working well for the diagram level.
+
+    - Make confetti when we press next
+
+    - Hitbox for the save slots
+
+    - Animate should play for the multipled vector and the scalar number should be the number of people in the hallways
+
+    - label for levels
+
+    - level 5 and other levels default values are not set properly when the level starts
+
+    -  //level 5 should not change the vector when arrows are pressed
+
+    - 8 people for level 7
+
+    - show the change vector in level 7 like in previous levels
+
+    - 
