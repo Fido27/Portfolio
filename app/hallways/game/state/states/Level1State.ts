@@ -1,5 +1,5 @@
 import * as Phaser from 'phaser';
-import { GameState, SharedData } from '../types';
+import { GameState, SharedData, NodeKey } from '../types';
 
 // Game State 1 (post-sandbox):
 // - Locks the input matrix and uses arrow-only traversal
@@ -31,6 +31,9 @@ export class Level1State implements GameState {
     if ((this.data as any).matrixLabels) {
       ((this.data as any).matrixLabels as Phaser.GameObjects.Text[]).forEach(l => l.setVisible(true));
     }
+
+    // Restrict arrows to those that would move the green circle from the current node
+    this.updateArrowsForNode(this.data.currentNode || 'A');
   }
 
   exit(): void {
@@ -62,6 +65,23 @@ export class Level1State implements GameState {
     const arrowObjects = Object.values(this.data.arrows || {}) as Phaser.GameObjects.GameObject[];
     arrowObjects.forEach((obj) => {
       if (enabled) (obj as any).setInteractive({ useHandCursor: true }); else (obj as any).disableInteractive();
+    });
+  }
+
+  // Called by the scene whenever the circle moves to a new node
+  public onNodeChanged(node: NodeKey) {
+    this.updateArrowsForNode(node);
+  }
+
+  private updateArrowsForNode(node: NodeKey) {
+    const arrows = this.data.arrows || {};
+    const allowed = node === 'A' ? ['left']
+      : node === 'B' ? ['top']
+      : node === 'C' ? ['right','center']
+      : ['bottom'];
+    Object.entries(arrows).forEach(([key, obj]) => {
+      if (allowed.includes(key)) (obj as any).setInteractive({ useHandCursor: true });
+      else (obj as any).disableInteractive();
     });
   }
 

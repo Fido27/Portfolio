@@ -1,6 +1,6 @@
 import * as Phaser from 'phaser';
 import { GameState, SharedData } from './types';
-import { Level1State, Level2State, Level3State, SandboxState, Level4State, Level5State, Level6State } from './states';
+import { Level1State, Level2State, Level3State, SandboxState, Level4State, Level5State, Level6State, Level7State } from './states';
 
 export class StateManager {
   private currentState: GameState | null = null;
@@ -15,6 +15,7 @@ export class StateManager {
     this.states.set(4, new Level4State(scene, data));
     this.states.set(5, new Level5State(scene, data));
     this.states.set(6, new Level6State(scene, data));
+    this.states.set(7, new Level7State(scene, data));
   }
 
   change(stateId: number) {

@@ -14,9 +14,8 @@ export class Level6State implements GameState {
 
   enter(): void {
     this.showPrompt();
-    // Use saved matrix (first non-empty slot if available)
-    const saved = (this.data.savedMatrices || []).find(v => Array.isArray(v) && v.length === 5) as number[] | undefined;
-    this.savedVector = saved ? saved.slice() : [0,0,0,0,0];
+    // Start with no saved selection; user can click a slot to load
+    this.savedVector = [0,0,0,0,0];
 
     // Lock editing of the input matrix; we'll populate it from saved*scalar
     this.setMatrixEnabled(false);
@@ -31,6 +30,11 @@ export class Level6State implements GameState {
 
     // Scalar/result UI
     this.buildScalarAndResult();
+    // Ensure input matrix displays zeros on entry
+    const input = this.data.matrixInput;
+    if (input) {
+      for (let r = 0; r < 5; r++) input.setValue(r, 0, '0');
+    }
     this.updateFromSavedAndScalar();
 
     // Show Save UI (button + slots)
@@ -54,7 +58,7 @@ export class Level6State implements GameState {
   public onMatrixUpdated(): void { this.updateFromSavedAndScalar(); }
 
   private showPrompt() {
-    const text = 'Use your saved matrix to trace the path [6,6,6,0,6]. You can change the multiplier. To edit the saved matrix, go to a previous level.';
+    const text = 'Use your saved matrix to trace the path [8,8,8,0,8]. You can change the multiplier. To edit the saved matrix, go to a previous level.';
     this.prompt = this.scene.add.text(1100, 120, text, { font: '24px Arial', color: '#222', wordWrap: { width: 500 } });
   }
 
@@ -102,18 +106,35 @@ export class Level6State implements GameState {
     this.scalarText = this.scene.add.text(rightX + cellSize/2, midY, '1', { font: '20px Arial', color: '#000' }).setOrigin(0.5);
     this.equalText = this.scene.add.text(rightX + cellSize + 32, midY, '=', { font: '28px Arial', color: '#000' }).setOrigin(0, 0.5);
 
-    // Scalar typing handler
-    this.scalarRect.on('pointerdown', () => {
+    // Scalar typing handler with focus, highlight, and clear-on-click
+    let scalarFocused = false;
+    const focusScalar = () => {
+      // highlight
+      this.scalarRect!.setStrokeStyle(4, 0x4287f5);
+      // clear current text for fresh input
+      this.scalarText!.setText('');
+      scalarFocused = true;
       this.scene.input.keyboard?.off('keydown');
       this.scene.input.keyboard?.on('keydown', (event: KeyboardEvent) => {
+        if (!scalarFocused) return;
         let v = this.scalarText!.text;
-        if (event.key === 'Backspace') v = v.slice(0, -1);
-        else if (event.key.length === 1 && /[0-9]/.test(event.key)) { if (v.length < 3) v += event.key; }
-        else if (event.key === 'Enter') { return; }
+        if (event.key === 'Backspace') {
+          v = v.slice(0, -1);
+        } else if (event.key.length === 1 && /[0-9]/.test(event.key)) {
+          if (v.length < 3) v += event.key;
+        } else if (event.key === 'Enter') {
+          scalarFocused = false;
+          this.scalarRect!.setStrokeStyle(2, 0x000000);
+          return;
+        }
         this.scalarText!.setText(v === '' ? '0' : v);
         this.updateFromSavedAndScalar();
       });
-    });
+    };
+
+    this.scalarRect.on('pointerdown', focusScalar);
+    this.scalarText.setInteractive({ useHandCursor: true });
+    this.scalarText.on('pointerdown', focusScalar);
 
     // Result vector brackets + cells
     this.resultGroup = this.scene.add.group();
@@ -143,14 +164,14 @@ export class Level6State implements GameState {
   }
 
   private updateFromSavedAndScalar() {
-    const s = parseInt(this.scalarText?.text || '0') || 0;
-    const vector = this.savedVector.map((n) => (parseInt(String(n)) || 0) * s);
-    // Update input matrix values so Animate uses the result
+    // Left input matrix should show the saved matrix (not multiplied)
     const input = this.data.matrixInput;
     if (input) {
-      for (let r = 0; r < 5; r++) input.setValue(r, 0, String(vector[r] || 0));
+      for (let r = 0; r < 5; r++) input.setValue(r, 0, String(this.savedVector[r] || 0));
     }
-    // Update visible result cells
+    // Right result shows saved * scalar
+    const s = parseInt(this.scalarText?.text || '1') || 1;
+    const vector = this.savedVector.map((n) => (parseInt(String(n)) || 0) * s);
     if (this.resultGroup) {
       for (let r = 0; r < 5; r++) {
         const txt = this.resultGroup.getChildren().find(c => c.name === `res_${r}`) as Phaser.GameObjects.Text | undefined;
@@ -196,6 +217,11 @@ export class Level6State implements GameState {
     }
     this.data.saveSlots = slots;
     this.data.savedMatrices = this.data.savedMatrices || [];
+
+    // Pre-populate slots with any previously saved matrices
+    (this.data.savedMatrices || []).forEach((vec, idx) => {
+      if (Array.isArray(vec) && vec.length === 5) this.renderVectorIntoSlot(idx, vec as number[]);
+    });
   }
 
   private setSaveUIVisible(visible: boolean) { this.data.saveUIContainer?.setVisible(visible); }
@@ -222,20 +248,27 @@ export class Level6State implements GameState {
   }
 
   private onSlotPressed(index: number) {
-    if (!this.data.saveModeActive) return;
-    const vector = (this.data.saveUIContainer as any).__pendingVector as number[];
-    if (!vector) return;
-    this.data.savedMatrices = this.data.savedMatrices || [];
-    this.data.savedMatrices[index] = vector.slice();
-    this.renderVectorIntoSlot(index, vector);
-    this.data.saveModeActive = false;
-    (this.data.saveUIContainer as any).__pendingVector = undefined;
-    (this.data.saveSlots || []).forEach(slot => {
-      slot.setScale(1);
-      slot.setAlpha(1);
-      const glow = slot.getData('glow') as Phaser.GameObjects.Graphics | undefined;
-      if (glow) glow.setAlpha(0);
-    });
+    if (this.data.saveModeActive) {
+      const vector = (this.data.saveUIContainer as any).__pendingVector as number[];
+      if (!vector) return;
+      this.data.savedMatrices = this.data.savedMatrices || [];
+      this.data.savedMatrices[index] = vector.slice();
+      this.renderVectorIntoSlot(index, vector);
+      this.data.saveModeActive = false;
+      (this.data.saveUIContainer as any).__pendingVector = undefined;
+      (this.data.saveSlots || []).forEach(slot => {
+        slot.setScale(1);
+        slot.setAlpha(1);
+        const glow = slot.getData('glow') as Phaser.GameObjects.Graphics | undefined;
+        if (glow) glow.setAlpha(0);
+      });
+    } else {
+      // Load mode: apply saved vector to Level 6 flow (saved * scalar)
+      const saved = (this.data.savedMatrices || [])[index] as number[] | undefined;
+      if (!saved) return;
+      this.savedVector = saved.slice();
+      this.updateFromSavedAndScalar();
+    }
   }
 
   private renderVectorIntoSlot(index: number, values: number[]) {

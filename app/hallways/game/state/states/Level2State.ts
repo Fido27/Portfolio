@@ -1,5 +1,5 @@
 import * as Phaser from 'phaser';
-import { GameState, SharedData } from '../types';
+import { GameState, SharedData, NodeKey } from '../types';
 
 export class Level2State implements GameState {
   private prompt?: Phaser.GameObjects.Text;
@@ -22,6 +22,9 @@ export class Level2State implements GameState {
     if ((this.data as any).matrixLabels) ((this.data as any).matrixLabels as Phaser.GameObjects.Text[]).forEach(l => l.setVisible(true));
     // Update occupancy vector on the scene
     if (typeof sceneAny.updateOccupancyVector === 'function') sceneAny.updateOccupancyVector();
+
+    // Restrict arrows to those that would move the green circle from the current node
+    this.updateArrowsForNode(this.data.currentNode || 'A');
   }
 
   exit(): void {
@@ -48,6 +51,23 @@ export class Level2State implements GameState {
     });
   }
 
+  // Called by the scene whenever the circle moves to a new node
+  public onNodeChanged(node: NodeKey) {
+    this.updateArrowsForNode(node);
+  }
+
+  private updateArrowsForNode(node: NodeKey) {
+    const arrows = this.data.arrows || {};
+    const allowed = node === 'A' ? ['left']
+      : node === 'B' ? ['top']
+      : node === 'C' ? ['right','center']
+      : ['bottom'];
+    Object.entries(arrows).forEach(([key, obj]) => {
+      if (allowed.includes(key)) (obj as any).setInteractive({ useHandCursor: true });
+      else (obj as any).disableInteractive();
+    });
+  }
+
   private resetPositionToStart() {
     if (!this.data.greenCircle) return;
     const coords = this.data.nodeCoords || {
@@ -63,7 +83,7 @@ export class Level2State implements GameState {
   }
 
   private showPrompt() {
-    const promptText = 'Level 2:\n\nClick the red arrows to move the green circle. every time the circle crosses a security camera, the camera increments its counter. \n\nCan you trace a path that matches the counters below:\n\nC1 : 5\nC2 : 5\nC3 : 5\nC4 : 2\nC5 : 3';
+    const promptText = 'Level 2:\n\nClick the red arrows to move the green circle. every time the circle crosses a security camera, the camera increments its counter. \n\nCan you trace a path that matches the counters below:\n\nC1 : 5\nC2 : 5\nC3 : 3\nC4 : 2\nC5 : 3';
     this.prompt = this.scene.add.text(1100, 120, promptText,
       { font: '28px Arial', color: '#222', wordWrap: { width: 500 } }
     );

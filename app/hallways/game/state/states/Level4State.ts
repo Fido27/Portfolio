@@ -81,6 +81,11 @@ export class Level4State implements GameState {
     }
     this.data.saveSlots = slots;
     this.data.savedMatrices = this.data.savedMatrices || [];
+
+    // Pre-populate slots with any previously saved matrices
+    (this.data.savedMatrices || []).forEach((vec, idx) => {
+      if (Array.isArray(vec) && vec.length === 5) this.renderVectorIntoSlot(idx, vec as number[]);
+    });
   }
 
   private setSaveUIVisible(visible: boolean) {
@@ -113,21 +118,30 @@ export class Level4State implements GameState {
   }
 
   private onSlotPressed(index: number) {
-    if (!this.data.saveModeActive) return;
-    const vector = (this.data.saveUIContainer as any).__pendingVector as number[];
-    if (!vector) return;
-    this.data.savedMatrices = this.data.savedMatrices || [];
-    this.data.savedMatrices[index] = vector.slice();
-    this.renderVectorIntoSlot(index, vector);
-    this.data.saveModeActive = false;
-    (this.data.saveUIContainer as any).__pendingVector = undefined;
-    // Clear slot highlights
-    (this.data.saveSlots || []).forEach(slot => {
-      slot.setScale(1);
-      slot.setAlpha(1);
-      const glow = slot.getData('glow') as Phaser.GameObjects.Graphics | undefined;
-      if (glow) glow.setAlpha(0);
-    });
+    if (this.data.saveModeActive) {
+      const vector = (this.data.saveUIContainer as any).__pendingVector as number[];
+      if (!vector) return;
+      this.data.savedMatrices = this.data.savedMatrices || [];
+      this.data.savedMatrices[index] = vector.slice();
+      this.renderVectorIntoSlot(index, vector);
+      this.data.saveModeActive = false;
+      (this.data.saveUIContainer as any).__pendingVector = undefined;
+      // Clear slot highlights
+      (this.data.saveSlots || []).forEach(slot => {
+        slot.setScale(1);
+        slot.setAlpha(1);
+        const glow = slot.getData('glow') as Phaser.GameObjects.Graphics | undefined;
+        if (glow) glow.setAlpha(0);
+      });
+    } else {
+      // Load mode: apply saved vector to input matrix
+      const saved = (this.data.savedMatrices || [])[index] as number[] | undefined;
+      if (!saved) return;
+      const input = this.data.matrixInput;
+      if (input) {
+        for (let r = 0; r < 5; r++) input.setValue(r, 0, String(saved[r] || 0));
+      }
+    }
   }
 
   private renderRoomDots() {

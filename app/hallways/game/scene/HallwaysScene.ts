@@ -50,7 +50,8 @@ export class HallwaysScene extends Phaser.Scene {
       selectedDest: 'A',
       peopleValue: '1',
       roomCounts: { A: 0, B: 0, C: 0, D: 0 },
-      currentNode: 'A'
+      currentNode: 'A',
+      savedMatrices: []
     };
 
     // board and UI
@@ -200,6 +201,10 @@ export class HallwaysScene extends Phaser.Scene {
       const { x, y } = (this.dataBag.nodeCoords || this.nodeCoords)[to];
       this.tweens.add({ targets: [this.dataBag.greenCircle, this.dataBag.greenCircleText], x, y, duration: 400, ease: 'Power2', onComplete: () => {
         this.dataBag.currentNode = to;
+        const current = this.stateManager.getCurrent() as any;
+        if (current && typeof current.onNodeChanged === 'function') {
+          current.onNodeChanged(to);
+        }
       }});
     };
 
@@ -227,6 +232,7 @@ export class HallwaysScene extends Phaser.Scene {
     const x = 1150, y = 620, rows = 5, cols = 1, cellSize = 50, spacing = 10;
     const values: string[][] = Array.from({ length: rows }, () => Array(cols).fill('0'));
     const cells: any[][] = [];
+    let focusedCell: any | null = null;
     const g = this.add.graphics();
     const extraHeight = 30; const bracketHeight = rows * cellSize + (rows - 1) * spacing + extraHeight; const bracketYOffset = -extraHeight / 2; const bracketWidth = 20; const overlap = 4;
     g.lineStyle(8, 0x000000);
@@ -250,9 +256,21 @@ export class HallwaysScene extends Phaser.Scene {
           else if (event.key.length === 1 && /[0-9\-]/.test(event.key)) { if (val.length < 3) val += event.key; }
           else if (event.key === 'Enter') { return; }
           values[cell.row][cell.col] = val; text.setText(val);
+          const current = this.stateManager.getCurrent() as any;
+          if (current && typeof current.onMatrixUpdated === 'function') current.onMatrixUpdated();
         };
         const cell = { rect, text, row: r, col: c };
         rect.on('pointerdown', () => {
+          // Remove previous highlight
+          if (focusedCell) focusedCell.rect.setStrokeStyle(2, 0x000000);
+          focusedCell = cell;
+          rect.setStrokeStyle(4, 0x4287f5); // Highlight
+          // Clear current cell value on click
+          values[cell.row][cell.col] = '';
+          text.setText('');
+          const current = this.stateManager.getCurrent() as any;
+          if (current && typeof current.onMatrixUpdated === 'function') current.onMatrixUpdated();
+
           this.input.keyboard?.off('keydown');
           this.input.keyboard?.on('keydown', onKey(cell));
         });
@@ -317,7 +335,8 @@ export class HallwaysScene extends Phaser.Scene {
     const input = this.dataBag.matrixInput;
     if (!input) return;
     const prev = parseInt(input.getValue(row, 0) || '0') || 0;
-    const inc = 1;
+    const currentId = this.stateManager.getCurrentId?.() ?? null;
+    const inc = currentId === 3 ? 2 : 1;
     input.setValue(row, 0, String(prev + inc));
     // Notify level state (e.g., Level 5) that matrix changed, so it can recompute results
     const current = this.stateManager.getCurrent() as any;
@@ -431,6 +450,22 @@ export class HallwaysScene extends Phaser.Scene {
       }
       this.resetGame();
       this.stateManager.change(4);
+    } else if ((this.stateManager.getCurrentId?.() ?? null) === 4) {
+      // Level 4: no checks or alerts; just advance
+      this.resetGame();
+      this.stateManager.change(5);
+    } else if ((this.stateManager.getCurrentId?.() ?? null) === 5) {
+      // Level 5: validate result equals [6,6,6,0,6]
+      const current = this.stateManager.getCurrent() as any;
+      if (current && typeof current.isLevelComplete === 'function') {
+        const ok = current.isLevelComplete();
+        if (!ok) {
+          alert("The values don't match");
+          return;
+        }
+      }
+      this.resetGame();
+      this.stateManager.change(6);
     } else {
       alert('Great job!');
     }
@@ -475,7 +510,7 @@ export class HallwaysScene extends Phaser.Scene {
 
     const lvlTitle = this.add.text(width - panelWidth + 24, 350, 'Level Select', { font: '20px Arial', color: '#000' });
     overlay.add(lvlTitle);
-    const levels = [ {label:'Sandbox', id:0}, {label:'Level 1', id:1}, {label:'Level 2', id:2}, {label:'Level 3', id:3}, {label:'Level 4', id:4}, {label:'Level 5', id:5}, {label:'Level 6', id:6} ];
+    const levels = [ {label:'Sandbox', id:0}, {label:'Level 1', id:1}, {label:'Level 2', id:2}, {label:'Level 3', id:3}, {label:'Level 4', id:4}, {label:'Level 5', id:5}, {label:'Level 6', id:6}, {label:'Level 7', id:7} ];
     levels.forEach((lvl, i) => {
       const lbtn = this.add.text(width - panelWidth + 24, 390 + i*40, lvl.label, { font: '20px Arial', color: '#0077cc' }).setInteractive({ useHandCursor: true });
       lbtn.on('pointerdown', () => { this.resetGame(); this.stateManager.change(lvl.id); this.resumeGame(); });
@@ -559,8 +594,12 @@ export class HallwaysScene extends Phaser.Scene {
   // Move one student from room "from" to room "to" with a small dot animation
   private transferOne(from: NodeKey, to: NodeKey) {
     const counts = this.dataBag.roomCounts || { A:0, B:0, C:0, D:0 };
-    // Default: move 1. If current state is Level 5, move 2.
+    // If no one in the source room, do nothing (except in Sandbox)
     const currentId = this.stateManager.getCurrentId?.() ?? null;
+    if (currentId !== 0 && ((counts as any)[from] || 0) <= 0) {
+      return;
+    }
+    // Default: move 1. If current state is Level 5, move 2.
     const delta = currentId === 5 ? 2 : 1;
     if ((counts as any)[from] > 0) {
       (counts as any)[from] = Math.max(0, (counts as any)[from] - delta);

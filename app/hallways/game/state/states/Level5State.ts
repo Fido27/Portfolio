@@ -111,18 +111,32 @@ export class Level5State implements GameState {
     // Equals centered vertically as well
     this.equalText = this.scene.add.text(rightX + cellSize + 32, midY, '=', { font: '28px Arial', color: '#000' }).setOrigin(0, 0.5);
 
-    // Handle typing for scalar
-    rect.on('pointerdown', () => {
+    // Handle typing for scalar with focus, highlight, and clear-on-click
+    let scalarFocused = false;
+    const focusScalar = () => {
+      rect.setStrokeStyle(4, 0x4287f5); // highlight
+      txt.setText(''); // clear current value
+      scalarFocused = true;
       this.scene.input.keyboard?.off('keydown');
       this.scene.input.keyboard?.on('keydown', (event: KeyboardEvent) => {
+        if (!scalarFocused) return;
         let v = txt.text;
-        if (event.key === 'Backspace') v = v.slice(0, -1);
-        else if (event.key.length === 1 && /[0-9]/.test(event.key)) { if (v.length < 3) v += event.key; }
-        else if (event.key === 'Enter') { return; }
+        if (event.key === 'Backspace') {
+          v = v.slice(0, -1);
+        } else if (event.key.length === 1 && /[0-9]/.test(event.key)) {
+          if (v.length < 3) v += event.key;
+        } else if (event.key === 'Enter') {
+          scalarFocused = false;
+          rect.setStrokeStyle(2, 0x000000);
+          return;
+        }
         txt.setText(v === '' ? '0' : v);
         this.updateResultVector();
       });
-    });
+    };
+    rect.on('pointerdown', focusScalar);
+    txt.setInteractive({ useHandCursor: true });
+    txt.on('pointerdown', focusScalar);
 
     // Build result vector group
     this.resultGroup = this.scene.add.group();
@@ -167,6 +181,19 @@ export class Level5State implements GameState {
     }
   }
 
+  // Used by the scene "Next" button to validate completion
+  public isLevelComplete(): boolean {
+    if (!this.data.matrixInput || !this.scalarText) return false;
+    const s = parseInt(this.scalarText.text) || 0;
+    const target = [6,6,6,0,6];
+    for (let r = 0; r < 5; r++) {
+      const base = parseInt(this.data.matrixInput.getValue(r, 0) || '0') || 0;
+      const val = base * s;
+      if (val !== target[r]) return false;
+    }
+    return true;
+  }
+
   // ==== Save UI (button + slots) ====
   private ensureSaveUI() {
     if (!this.data.saveUIContainer) this.data.saveUIContainer = this.scene.add.container(0, 0);
@@ -204,6 +231,11 @@ export class Level5State implements GameState {
     }
     this.data.saveSlots = slots;
     this.data.savedMatrices = this.data.savedMatrices || [];
+
+    // Pre-populate slots with any previously saved matrices
+    (this.data.savedMatrices || []).forEach((vec, idx) => {
+      if (Array.isArray(vec) && vec.length === 5) this.renderVectorIntoSlot(idx, vec as number[]);
+    });
   }
 
   private setSaveUIVisible(visible: boolean) { this.data.saveUIContainer?.setVisible(visible); }
@@ -230,20 +262,30 @@ export class Level5State implements GameState {
   }
 
   private onSlotPressed(index: number) {
-    if (!this.data.saveModeActive) return;
-    const vector = (this.data.saveUIContainer as any).__pendingVector as number[];
-    if (!vector) return;
-    this.data.savedMatrices = this.data.savedMatrices || [];
-    this.data.savedMatrices[index] = vector.slice();
-    this.renderVectorIntoSlot(index, vector);
-    this.data.saveModeActive = false;
-    (this.data.saveUIContainer as any).__pendingVector = undefined;
-    (this.data.saveSlots || []).forEach(slot => {
-      slot.setScale(1);
-      slot.setAlpha(1);
-      const glow = slot.getData('glow') as Phaser.GameObjects.Graphics | undefined;
-      if (glow) glow.setAlpha(0);
-    });
+    if (this.data.saveModeActive) {
+      const vector = (this.data.saveUIContainer as any).__pendingVector as number[];
+      if (!vector) return;
+      this.data.savedMatrices = this.data.savedMatrices || [];
+      this.data.savedMatrices[index] = vector.slice();
+      this.renderVectorIntoSlot(index, vector);
+      this.data.saveModeActive = false;
+      (this.data.saveUIContainer as any).__pendingVector = undefined;
+      (this.data.saveSlots || []).forEach(slot => {
+        slot.setScale(1);
+        slot.setAlpha(1);
+        const glow = slot.getData('glow') as Phaser.GameObjects.Graphics | undefined;
+        if (glow) glow.setAlpha(0);
+      });
+    } else {
+      // Load mode: apply saved vector to input matrix
+      const saved = (this.data.savedMatrices || [])[index] as number[] | undefined;
+      if (!saved) return;
+      const input = this.data.matrixInput;
+      if (input) {
+        for (let r = 0; r < 5; r++) input.setValue(r, 0, String(saved[r] || 0));
+      }
+      this.updateResultVector();
+    }
   }
 
   private renderVectorIntoSlot(index: number, values: number[]) {

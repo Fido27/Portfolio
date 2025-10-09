@@ -12,7 +12,7 @@ type CountryDoc = {
 	capital?: string;
 	area_km2?: number;
 	gdp_usd?: number;
-	flag_url?: string;
+	flag_id?: string;
 	timezone?: string; // e.g., "Asia/Kolkata"
 	utc_offset_min?: number; // fallback minutes offset
 	weather_summary?: string; // e.g., "Sunny"
@@ -72,7 +72,7 @@ function formatCurrency(value: number | undefined) {
 }
 
 function getApiBase(): string {
-	return process.env.NEXT_PUBLIC_API_BASE || "http://localhost:8000";
+	return "http://localhost:3000";
 }
 
 function nowUtcMs() {
@@ -274,8 +274,8 @@ export default function Page() {
 				key: "flag",
 				label: "Flag",
 				group: "meta",
-				render: (c) => (c.flag_url ? "🖼️" : "—"),
-				measureText: (c) => (c.flag_url ? "image" : "-"),
+				render: (c) => (c.flag_id ? "🖼️" : "—"),
+				measureText: (c) => (c.flag_id ? "image" : "-"),
 			},
 			{
 				key: "name",
@@ -406,8 +406,7 @@ export default function Page() {
 	const sync = useSyncedVerticalScroll();
 
 	useEffect(() => {
-		const url = `${getApiBase()}/WorldClock?page=1&pageSize=200&sort=name:asc`;
-		fetch(url, { cache: "no-store" })
+		fetch(`/api/worldclock`, { cache: "no-store" })
 			.then(async (r) => {
 				if (!r.ok) throw new Error(`Request failed ${r.status}`);
 				return (await r.json()) as ListResponse;
