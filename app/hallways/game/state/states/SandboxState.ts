@@ -41,6 +41,7 @@ export class SandboxState implements GameState {
     // Slots
     const slots: Phaser.GameObjects.Container[] = [];
     const baseX = 268; const baseY = 114; const gap = 90; const w = 54; const h = 90;
+    const pad = 20; // expand hitbox padding on all sides
     for (let i = 0; i < 4; i++) {
       const slot = this.scene.add.container(baseX + i * gap, baseY);
       // Glow outline (hidden until Save pressed)
@@ -50,13 +51,15 @@ export class SandboxState implements GameState {
       const frame = this.scene.add.graphics();
       frame.lineStyle(3, 0x000000).strokeRoundedRect(-w/2, -h/2, w, h, 6);
       const label = this.scene.add.text(0, 0, ['A','B','C','D'][i], { font: '18px Arial', color: '#000' }).setOrigin(0.5);
-      slot.add([glow, frame, label]);
-      slot.setSize(w, h);
-      slot.setInteractive(new Phaser.Geom.Rectangle(-w/2, -h/2, w, h), Phaser.Geom.Rectangle.Contains);
+      // Transparent centered hit target to avoid top-left anchoring issues
+      const hit = this.scene.add.rectangle(0, 0, w + pad, h + pad, 0x000000, 0).setOrigin(0.5).setInteractive({ useHandCursor: true });
+      slot.add([glow, frame, label, hit]);
+      // Enlarge the container size to match hit area
+      slot.setSize(w + pad, h + pad);
       slot.setData('glow', glow);
       slot.setData('w', w);
       slot.setData('h', h);
-      slot.on('pointerdown', () => this.onSlotPressed(i));
+      hit.on('pointerdown', () => this.onSlotPressed(i));
       container.add(slot);
       slots.push(slot);
     }
@@ -173,6 +176,9 @@ export class SandboxState implements GameState {
         this.data.roomPeopleRects![letter] = rect; this.data.roomPeopleTexts![letter] = txt;
         rect.on('pointerdown', () => this.setupRoomKeyHandler(letter));
       }
+      // Always synchronize the displayed value with current roomCounts on (re)enter
+      const curVal = this.data.roomCounts?.[letter] ?? 0;
+      if (this.data.roomPeopleTexts![letter]) this.data.roomPeopleTexts![letter]!.setText(String(curVal));
       // transfer buttons
       const pull = this.scene.add.text(cellX + 60, y, '← Hall', { font: '18px Arial', color: '#fff', backgroundColor: '#444', padding: { left: 8, right: 8, top: 4, bottom: 4 } }).setInteractive({ useHandCursor: true });
       const push = this.scene.add.text(cellX + 150, y, '→ Room', { font: '18px Arial', color: '#fff', backgroundColor: '#444', padding: { left: 8, right: 8, top: 4, bottom: 4 } }).setInteractive({ useHandCursor: true });

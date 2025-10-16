@@ -6,5 +6,6 @@ export { Level4State } from './Level4State';
 export { Level5State } from './Level5State';
 export { Level6State } from './Level6State';
 export { Level7State } from './Level7State';
+export { Level8State } from './Level8State';
 
 

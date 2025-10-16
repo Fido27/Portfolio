@@ -346,40 +346,57 @@ export class HallwaysScene extends Phaser.Scene {
   }
 
   private resetGame() {
-    const currentState = this.stateManager.getCurrent() as any;
-    if (currentState && typeof currentState.resetState === 'function') {
-      currentState.resetState();
-    } else {
-      // Fallback: reset matrix values and position if state-specific reset not available
-      const input = this.dataBag.matrixInput;
-      if (input) {
-        for (let r = 0; r < input.cells.length; r++) {
-          for (let c = 0; c < input.cells[r].length; c++) {
-            input.setValue(r, c, '0');
-          }
+    // Always force everything back to the level's defined defaults
+    const currentId = this.stateManager.getCurrentId?.() ?? 0;
+
+    // 1) Clear default 5x1 matrix values (safe no-op for Level 7 which hides it)
+    const input = this.dataBag.matrixInput;
+    if (input) {
+      for (let r = 0; r < input.cells.length; r++) {
+        for (let c = 0; c < input.cells[r].length; c++) {
+          input.setValue(r, c, '0');
         }
       }
-      const coords = this.dataBag.nodeCoords || { A: { x: 240, y: 560 } as any, B:{x:240,y:240} as any, C:{x:560,y:240} as any, D:{x:560,y:560} as any };
-      const startKey = (this.dataBag.selectedStart || 'A') as 'A'|'B'|'C'|'D';
-      const start = (coords as any)[startKey];
-      if (this.dataBag.greenCircle && start) {
-        this.dataBag.greenCircle.setPosition(start.x, start.y);
-        this.dataBag.currentNode = startKey;
-      }
-      if (this.dataBag.greenCircleText && start) this.dataBag.greenCircleText.setPosition(start.x, start.y);
-      // Re-render room dots if helper exists
-      const sceneAny = this as any;
-      if (sceneAny && typeof sceneAny['__layoutRoomDots'] === 'function') {
-        ['A','B','C','D'].forEach((letter) => {
-          const count = (this.dataBag.roomCounts as any)?.[letter] || 0;
-          sceneAny['__layoutRoomDots'](letter, count);
-        });
-      }
-      // Update occupancy vector values
-      this.updateOccupancyVector();
     }
 
-    // Reset timer
+    // 2) Reset room counts to per-level defaults
+    const defaultCounts = (() => {
+      if (currentId === 7) return { A: 8, B: 8, C: 8, D: 8 } as any;
+      if (currentId === 0) return { A: 0, B: 0, C: 0, D: 0 } as any;
+      return { A: 5, B: 5, C: 5, D: 5 } as any; // Levels 1–6
+    })();
+    this.dataBag.roomCounts = defaultCounts;
+
+    // 3) Reset position to A immediately (enter() will also do this)
+    const coords = this.dataBag.nodeCoords || { A:{x:240,y:560}, B:{x:240,y:240}, C:{x:560,y:240}, D:{x:560,y:560} };
+    const start = (coords as any)['A'];
+    if (this.dataBag.greenCircle && start) {
+      this.dataBag.greenCircle.setPosition(start.x, start.y);
+      this.dataBag.currentNode = 'A';
+    }
+    if (this.dataBag.greenCircleText && start) this.dataBag.greenCircleText.setPosition(start.x, start.y);
+
+    // 4) Refresh dots and occupancy values
+    const sceneAny = this as any;
+    if (sceneAny && typeof sceneAny['__layoutRoomDots'] === 'function') {
+      ['A','B','C','D'].forEach((letter) => {
+        const count = (this.dataBag.roomCounts as any)?.[letter] || 0;
+        sceneAny['__layoutRoomDots'](letter, count);
+      });
+    }
+    this.updateOccupancyVector();
+
+    // 4b) If Sandbox room inputs exist, sync those text boxes to counts
+    const roomTexts = this.dataBag.roomPeopleTexts || {};
+    (['A','B','C','D'] as ('A'|'B'|'C'|'D')[]).forEach((l) => {
+      const t = (roomTexts as any)[l] as Phaser.GameObjects.Text | undefined;
+      if (t) t.setText(String((this.dataBag.roomCounts as any)[l] || 0));
+    });
+
+    // 5) Re-enter the current level to rebuild level-specific UI and logic defaults
+    this.stateManager.change(currentId);
+
+    // 6) Reset timer
     this.startTime = this.time.now;
     this.baseElapsedMs = 0;
     this.resumeStartMs = this.time.now;
@@ -510,7 +527,7 @@ export class HallwaysScene extends Phaser.Scene {
 
     const lvlTitle = this.add.text(width - panelWidth + 24, 350, 'Level Select', { font: '20px Arial', color: '#000' });
     overlay.add(lvlTitle);
-    const levels = [ {label:'Sandbox', id:0}, {label:'Level 1', id:1}, {label:'Level 2', id:2}, {label:'Level 3', id:3}, {label:'Level 4', id:4}, {label:'Level 5', id:5}, {label:'Level 6', id:6}, {label:'Level 7', id:7} ];
+    const levels = [ {label:'Sandbox', id:0}, {label:'Level 1', id:1}, {label:'Level 2', id:2}, {label:'Level 3', id:3}, {label:'Level 4', id:4}, {label:'Level 5', id:5}, {label:'Level 6', id:6}, {label:'Level 7', id:7}, {label:'Level 8', id:8} ];
     levels.forEach((lvl, i) => {
       const lbtn = this.add.text(width - panelWidth + 24, 390 + i*40, lvl.label, { font: '20px Arial', color: '#0077cc' }).setInteractive({ useHandCursor: true });
       lbtn.on('pointerdown', () => { this.resetGame(); this.stateManager.change(lvl.id); this.resumeGame(); });

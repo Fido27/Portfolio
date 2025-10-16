@@ -24,6 +24,8 @@ export interface SharedData {
   greenCircleText?: Phaser.GameObjects.Text;
   arrows?: { [key: string]: Phaser.GameObjects.GameObject };
   occupancyVector?: Phaser.GameObjects.Group;
+  // Level title label shown at the top
+  levelTitleText?: Phaser.GameObjects.Text;
   // Sandbox UI elements
   sandboxContainer?: Phaser.GameObjects.Container;
   peopleCellText?: Phaser.GameObjects.Text;

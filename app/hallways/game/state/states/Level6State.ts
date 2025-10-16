@@ -199,6 +199,7 @@ export class Level6State implements GameState {
     // Slots with glow highlight support
     const slots: Phaser.GameObjects.Container[] = [];
     const baseX = 268; const baseY = 114; const gap = 90; const w = 54; const h = 90;
+    const pad = 20; // expand hitbox padding
     for (let i = 0; i < 4; i++) {
       const slot = this.scene.add.container(baseX + i * gap, baseY);
       const glow = this.scene.add.graphics();
@@ -207,11 +208,11 @@ export class Level6State implements GameState {
       const frame = this.scene.add.graphics();
       frame.lineStyle(3, 0x000000).strokeRoundedRect(-w/2, -h/2, w, h, 6);
       const label = this.scene.add.text(0, 0, ['A','B','C','D'][i], { font: '18px Arial', color: '#000' }).setOrigin(0.5);
-      slot.add([glow, frame, label]);
-      slot.setSize(w, h);
-      slot.setInteractive(new Phaser.Geom.Rectangle(-w/2, -h/2, w, h), Phaser.Geom.Rectangle.Contains);
+      const hit = this.scene.add.rectangle(0, 0, w + pad, h + pad, 0x000000, 0).setOrigin(0.5).setInteractive({ useHandCursor: true });
+      slot.add([glow, frame, label, hit]);
+      slot.setSize(w + pad, h + pad);
       slot.setData('glow', glow);
-      slot.on('pointerdown', () => this.onSlotPressed(i));
+      hit.on('pointerdown', () => this.onSlotPressed(i));
       container.add(slot);
       slots.push(slot);
     }
