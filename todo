@@ -3,11 +3,11 @@ TODO:
 
     - Make confetti when we press next
 
-    - Hitbox for the save slots
+    - // Hitbox for the save slots
 
     - Animate should play for the multipled vector and the scalar number should be the number of people in the hallways
 
-    - label for levels
+    - // label for levels
 
     - level 5 and other levels default values are not set properly when the level starts
 
@@ -15,4 +15,16 @@ TODO:
 
     - show the change vector in level 7 like in previous levels
 
-    - 
+    - level 8, make abcd, delta , live change vector fro delta vector
+
+    - Animate when we click next. animate everything
+
+    - Number of people in the big circle . for some levels like level5
+
+    - change the lebels of the sve slots
+
+    - action goals above the diagram (bold persistent carry forwards details)
+
+    - Animate the numbers as other stuff is also being animated
+
+    - pulse animation on arrows

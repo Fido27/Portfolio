@@ -207,11 +207,19 @@ export class Level6State implements GameState {
       glow.setAlpha(0);
       const frame = this.scene.add.graphics();
       frame.lineStyle(3, 0x000000).strokeRoundedRect(-w/2, -h/2, w, h, 6);
+      const preview = this.scene.add.container(0, 0);
+      preview.setVisible(false);
       const label = this.scene.add.text(0, 0, ['A','B','C','D'][i], { font: '18px Arial', color: '#000' }).setOrigin(0.5);
       const hit = this.scene.add.rectangle(0, 0, w + pad, h + pad, 0x000000, 0).setOrigin(0.5).setInteractive({ useHandCursor: true });
-      slot.add([glow, frame, label, hit]);
+      slot.add([glow, frame]);
+      slot.add(preview);
+      slot.add(label);
+      slot.add(hit);
       slot.setSize(w + pad, h + pad);
       slot.setData('glow', glow);
+      slot.setData('label', label);
+      slot.setData('vectorContainer', preview);
+      slot.setData('hitZone', hit);
       hit.on('pointerdown', () => this.onSlotPressed(i));
       container.add(slot);
       slots.push(slot);
@@ -273,28 +281,49 @@ export class Level6State implements GameState {
   }
 
   private renderVectorIntoSlot(index: number, values: number[]) {
-    const slot = (this.data.saveSlots || [])[index]; if (!slot) return;
-    slot.removeAll(true);
-    const w = 54, h = 90; const cellSize = 12; const spacing = 4;
-    const frame = this.scene.add.graphics();
-    frame.lineStyle(3, 0x000000).strokeRoundedRect(-w/2, -h/2, w, h, 6);
-    slot.add(frame);
-    const x = -4; const y = -h/2 + 6;
-    const g = this.scene.add.graphics();
-    const rows = values.length; const brW = 6; const overlap = 2; const brH = rows*cellSize + (rows-1)*spacing + 8;
-    g.lineStyle(2, 0x000000);
-    g.strokeLineShape(new Phaser.Geom.Line(x - brW, y, x - brW, y + brH));
-    g.strokeLineShape(new Phaser.Geom.Line(x - brW - overlap, y, x, y));
-    g.strokeLineShape(new Phaser.Geom.Line(x - brW - overlap, y + brH, x, y + brH));
+    const slot = (this.data.saveSlots || [])[index];
+    if (!slot) return;
+    const preview = slot.getData('vectorContainer') as Phaser.GameObjects.Container | undefined;
+    if (!preview) return;
+
+    preview.removeAll(true);
+
+    const label = slot.getData('label') as Phaser.GameObjects.Text | undefined;
+    if (!values || !values.length) {
+      preview.setVisible(false);
+      if (label) label.setVisible(true);
+      return;
+    }
+
+    preview.setVisible(true);
+    if (label) label.setVisible(false);
+
+    const w = 54;
+    const h = 90;
+    const cellSize = 12;
+    const spacing = 4;
+    const top = -h/2 + 10;
+    const x = -4;
+    const rows = values.length;
+    const brW = 6;
+    const overlap = 2;
+    const brH = rows * cellSize + (rows - 1) * spacing + 8;
+
+    const brackets = this.scene.add.graphics();
+    brackets.lineStyle(2, 0x000000);
+    brackets.strokeLineShape(new Phaser.Geom.Line(x - brW, top, x - brW, top + brH));
+    brackets.strokeLineShape(new Phaser.Geom.Line(x - brW - overlap, top, x, top));
+    brackets.strokeLineShape(new Phaser.Geom.Line(x - brW - overlap, top + brH, x, top + brH));
     const rightX = x + cellSize;
-    g.strokeLineShape(new Phaser.Geom.Line(rightX + brW, y, rightX + brW, y + brH));
-    g.strokeLineShape(new Phaser.Geom.Line(rightX, y, rightX + brW + overlap, y));
-    g.strokeLineShape(new Phaser.Geom.Line(rightX, y + brH, rightX + brW + overlap, y + brH));
-    slot.add(g);
+    brackets.strokeLineShape(new Phaser.Geom.Line(rightX + brW, top, rightX + brW, top + brH));
+    brackets.strokeLineShape(new Phaser.Geom.Line(rightX, top, rightX + brW + overlap, top));
+    brackets.strokeLineShape(new Phaser.Geom.Line(rightX, top + brH, rightX + brW + overlap, top + brH));
+    preview.add(brackets);
+
     for (let r = 0; r < rows; r++) {
-      const ty = y + r * (cellSize + spacing) + cellSize/2;
-      const txt = this.scene.add.text(x + cellSize/2, ty, String(values[r]), { font: '12px Arial', color: '#000' }).setOrigin(0.5);
-      slot.add(txt);
+      const ty = top + r * (cellSize + spacing) + cellSize / 2;
+      const txt = this.scene.add.text(x + cellSize / 2, ty, String(values[r]), { font: '12px Arial', color: '#000' }).setOrigin(0.5);
+      preview.add(txt);
     }
   }
 }

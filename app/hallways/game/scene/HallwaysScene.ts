@@ -60,9 +60,9 @@ export class HallwaysScene extends Phaser.Scene {
     this.createControls();
     // (Removed) occupancy vector UI
 
-    // state manager: start at Sandbox (0)
+    // state manager: start at Level 1
     this.stateManager = new StateManager(this, this.dataBag);
-    this.stateManager.change(0);
+    this.stateManager.change(1);
 
     // Occupancy vector UI [A,B,C,D]
     const vectorValues = [0,0,0,0];
@@ -185,6 +185,32 @@ export class HallwaysScene extends Phaser.Scene {
       center: this.add.image(400, 400 + dy, 'red_arrow').setScale(0.3).setAngle(135).setInteractive({ useHandCursor: true })
     };
 
+    const pulseArrow = (arrow: Phaser.GameObjects.Image) => {
+      const baseScaleX = arrow.getData('baseScaleX') ?? arrow.scaleX;
+      const baseScaleY = arrow.getData('baseScaleY') ?? arrow.scaleY;
+      const previousTween = arrow.getData('pulseTween') as Phaser.Tweens.Tween | undefined;
+      previousTween?.stop();
+      arrow.setScale(baseScaleX, baseScaleY);
+      const tween = this.tweens.add({
+        targets: arrow,
+        scaleX: baseScaleX * 1.12,
+        scaleY: baseScaleY * 1.12,
+        duration: 140,
+        yoyo: true,
+        ease: 'Sine.easeInOut',
+        onComplete: () => {
+          arrow.setScale(baseScaleX, baseScaleY);
+          arrow.setData('pulseTween', undefined);
+        }
+      });
+      arrow.setData('pulseTween', tween);
+    };
+
+    Object.values(arrows).forEach((arrow) => {
+      arrow.setData('baseScaleX', (arrow as Phaser.GameObjects.Image).scaleX);
+      arrow.setData('baseScaleY', (arrow as Phaser.GameObjects.Image).scaleY);
+    });
+
     const greenCircle = this.add.circle(this.nodeCoords.A.x, this.nodeCoords.A.y, 14, 0x2ecc40);
     // ensure no badge text is displayed (no hallway count)
     const greenText = this.add.text(this.nodeCoords.A.x, this.nodeCoords.A.y, '', { font: '16px Arial', color: '#fff' }).setOrigin(0.5);
@@ -220,12 +246,19 @@ export class HallwaysScene extends Phaser.Scene {
       }
     };
 
+    const registerArrow = (arrow: Phaser.GameObjects.Image, from: NodeKey, to: NodeKey, camIdx: number) => {
+      arrow.on('pointerdown', () => {
+        pulseArrow(arrow);
+        handleArrow(from, to, camIdx);
+      });
+    };
+
     // Map each arrow to its hallway edge
-    arrows.left.on('pointerdown', () => handleArrow('A', 'B', 0));   // C1: A -> B
-    arrows.top.on('pointerdown', () => handleArrow('B', 'C', 1));    // C2: B -> C
-    arrows.right.on('pointerdown', () => handleArrow('C', 'D', 2));  // C3: C -> D
-    arrows.center.on('pointerdown', () => handleArrow('C', 'A', 3)); // C4: C -> A
-    arrows.bottom.on('pointerdown', () => handleArrow('D', 'A', 4)); // C5: D -> A
+    registerArrow(arrows.left, 'A', 'B', 0);   // C1: A -> B
+    registerArrow(arrows.top, 'B', 'C', 1);    // C2: B -> C
+    registerArrow(arrows.right, 'C', 'D', 2);  // C3: C -> D
+    registerArrow(arrows.center, 'C', 'A', 3); // C4: C -> A
+    registerArrow(arrows.bottom, 'D', 'A', 4); // C5: D -> A
   }
 
   private createMatrixInput() {
@@ -483,6 +516,15 @@ export class HallwaysScene extends Phaser.Scene {
       }
       this.resetGame();
       this.stateManager.change(6);
+    } else if ((this.stateManager.getCurrentId?.() ?? null) === 6) {
+      this.resetGame();
+      this.stateManager.change(7);
+    } else if ((this.stateManager.getCurrentId?.() ?? null) === 7) {
+      this.resetGame();
+      this.stateManager.change(8);
+    } else if ((this.stateManager.getCurrentId?.() ?? null) === 8) {
+      this.resetGame();
+      this.stateManager.change(9);
     } else {
       alert('Great job!');
     }
@@ -527,7 +569,7 @@ export class HallwaysScene extends Phaser.Scene {
 
     const lvlTitle = this.add.text(width - panelWidth + 24, 350, 'Level Select', { font: '20px Arial', color: '#000' });
     overlay.add(lvlTitle);
-    const levels = [ {label:'Sandbox', id:0}, {label:'Level 1', id:1}, {label:'Level 2', id:2}, {label:'Level 3', id:3}, {label:'Level 4', id:4}, {label:'Level 5', id:5}, {label:'Level 6', id:6}, {label:'Level 7', id:7}, {label:'Level 8', id:8} ];
+    const levels = [ {label:'Sandbox', id:0}, {label:'Level 1', id:1}, {label:'Level 2', id:2}, {label:'Level 3', id:3}, {label:'Level 4', id:4}, {label:'Level 5', id:5}, {label:'Level 6', id:6}, {label:'Level 7', id:7}, {label:'Level 8', id:8}, {label:'Level 9', id:9} ];
     levels.forEach((lvl, i) => {
       const lbtn = this.add.text(width - panelWidth + 24, 390 + i*40, lvl.label, { font: '20px Arial', color: '#0077cc' }).setInteractive({ useHandCursor: true });
       lbtn.on('pointerdown', () => { this.resetGame(); this.stateManager.change(lvl.id); this.resumeGame(); });
@@ -611,19 +653,29 @@ export class HallwaysScene extends Phaser.Scene {
   // Move one student from room "from" to room "to" with a small dot animation
   private transferOne(from: NodeKey, to: NodeKey) {
     const counts = this.dataBag.roomCounts || { A:0, B:0, C:0, D:0 };
-    // If no one in the source room, do nothing (except in Sandbox)
     const currentId = this.stateManager.getCurrentId?.() ?? null;
-    if (currentId !== 0 && ((counts as any)[from] || 0) <= 0) {
-      return;
-    }
-    // Default: move 1. If current state is Level 5, move 2.
-    const delta = currentId === 5 ? 2 : 1;
-    if ((counts as any)[from] > 0) {
-      (counts as any)[from] = Math.max(0, (counts as any)[from] - delta);
-      (counts as any)[to] = ((counts as any)[to] || 0) + delta;
-      this.dataBag.roomCounts = counts as any;
+    const available = Math.max(0, (counts as any)[from] || 0);
+    if (currentId !== 0 && available <= 0) return;
 
-      // Refresh dots layout if helper exists
+    let delta = 1;
+    if (currentId === 3) delta = 2;
+    else if (currentId === 5) {
+      const mult = this.dataBag.movementMultiplier;
+      delta = typeof mult === 'number' ? Math.max(0, mult) : 2;
+    }
+
+    let moveAmount = delta;
+    if (currentId !== 0) moveAmount = Math.min(available, delta);
+    if (moveAmount <= 0) return;
+
+    const newFrom = Math.max(0, available - moveAmount);
+    const actualMoved = available - newFrom;
+
+    (counts as any)[from] = newFrom;
+    (counts as any)[to] = ((counts as any)[to] || 0) + actualMoved;
+    this.dataBag.roomCounts = counts as any;
+
+    if (actualMoved > 0) {
       const sceneAny = this as any;
       if (sceneAny && typeof sceneAny['__layoutRoomDots'] === 'function') {
         ['A','B','C','D'].forEach((letter) => {

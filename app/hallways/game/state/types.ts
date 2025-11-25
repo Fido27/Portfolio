@@ -37,6 +37,7 @@ export interface SharedData {
   saveSlots?: Phaser.GameObjects.Container[];
   savedMatrices?: number[][]; // per-slot saved 5x1 vectors
   saveModeActive?: boolean;
+  movementMultiplier?: number;
   selectedStart: NodeKey | null;
   selectedDest: NodeKey | null;
   peopleValue: string;

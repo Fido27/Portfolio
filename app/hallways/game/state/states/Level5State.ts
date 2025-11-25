@@ -18,6 +18,11 @@ export class Level5State implements GameState {
     // Start with 5 per room
     this.data.roomCounts = { A: 5, B: 5, C: 5, D: 5 };
     this.resetPositionToStart();
+    if (this.data.greenCircleText) {
+      this.data.greenCircleText.setVisible(true);
+      const circle = this.data.greenCircle;
+      if (circle) this.data.greenCircleText.setPosition(circle.x, circle.y);
+    }
     this.renderRoomDots();
     // Ensure matrix brackets (frame) visible and labels C1–C5 visible
     if ((this.data as any).matrixFrame) (this.data as any).matrixFrame.setVisible(true);
@@ -51,6 +56,11 @@ export class Level5State implements GameState {
     this.equalText?.destroy();
     this.resultGroup?.clear(true, true);
     this.setSaveUIVisible(false);
+    this.data.movementMultiplier = undefined;
+    if (this.data.greenCircleText) {
+      this.data.greenCircleText.setVisible(false);
+      this.data.greenCircleText.setText('');
+    }
   }
 
   update(): void {}
@@ -172,7 +182,10 @@ export class Level5State implements GameState {
 
   private updateResultVector() {
     if (!this.data.matrixInput || !this.resultGroup || !this.scalarText) return;
-    const s = parseInt(this.scalarText.text) || 0;
+    const scalarTextValue = this.scalarText.text || '0';
+    const s = parseInt(scalarTextValue, 10) || 0;
+    this.data.movementMultiplier = Math.max(0, s);
+    this.syncGreenCircleBadgeWithScalar(scalarTextValue);
     for (let r = 0; r < 5; r++) {
       const base = parseInt(this.data.matrixInput.getValue(r, 0) || '0') || 0;
       const val = base * s;
@@ -314,6 +327,16 @@ export class Level5State implements GameState {
       const txt = this.scene.add.text(x + cellSize/2, ty, String(values[r]), { font: '12px Arial', color: '#000' }).setOrigin(0.5);
       slot.add(txt);
     }
+  }
+
+  private syncGreenCircleBadgeWithScalar(value: string) {
+    const badge = this.data.greenCircleText;
+    if (!badge) return;
+    const display = value === '' ? '0' : value;
+    badge.setVisible(true);
+    badge.setText(display);
+    const circle = this.data.greenCircle;
+    if (circle) badge.setPosition(circle.x, circle.y);
   }
 }
 
