@@ -1,12 +1,12 @@
-from fastapi import APIRouter
-from pydantic import BaseModel
-from typing import Any
-import os
-from appwrite.client import Client
-from appwrite.services.databases import Databases
-from appwrite.id import ID
-from fastapi import HTTPException
 import asyncio
+import os
+from typing import Any
+
+from appwrite.client import Client
+from appwrite.id import ID
+from appwrite.services.databases import Databases
+from fastapi import APIRouter, HTTPException
+from pydantic import BaseModel
 
 api = APIRouter(prefix="/clone")
 
@@ -26,30 +26,45 @@ def _db() -> Databases:
     )
     return Databases(client)
 
+
 def _ensure_schema(db: Databases, database_id: str, collection_id: str):
     """Best-effort create attributes and a unique index for username.
     If they already exist, ignore errors.
     """
     try:
         # username: string(64), required, not array
-        db.create_string_attribute(database_id, collection_id, key="username", size=64, required=True)
+        db.create_string_attribute(
+            database_id, collection_id, key="username", size=64, required=True
+        )
     except Exception:
         pass
     try:
         # sessions: json, optional
-        db.create_json_attribute(database_id, collection_id, key="sessions", required=False)
+        db.create_json_attribute(
+            database_id, collection_id, key="sessions", required=False
+        )
     except Exception:
         pass
     try:
         # activeId: string(64), optional
-        db.create_string_attribute(database_id, collection_id, key="activeId", size=64, required=False)
+        db.create_string_attribute(
+            database_id, collection_id, key="activeId", size=64, required=False
+        )
     except Exception:
         pass
     try:
         # unique index on username
-        db.create_index(database_id, collection_id, key="username_unique", type="unique", attributes=["username"], orders=["ASC"])
+        db.create_index(
+            database_id,
+            collection_id,
+            key="username_unique",
+            type="unique",
+            attributes=["username"],
+            orders=["ASC"],
+        )
     except Exception:
         pass
+
 
 def ensure_collection_ready():
     """Initialize collection attributes/index if missing. Returns status dict."""
@@ -62,19 +77,30 @@ def ensure_collection_ready():
     except Exception as e:
         return {"ok": False, "error": str(e)}
 
+
 @api.post("/user/upsert")
 async def upsert_user(req: UpsertRequest):
     database_id = os.environ.get("APPWRITE_DATABASE_ID", "")
     collection_id = os.environ.get("APPWRITE_COLLECTION_ID", "")
     db = _db()
     from appwrite.query import Query
-    data = {"username": req.username, "sessions": req.sessions or [], "activeId": req.activeId}
+
+    data = {
+        "username": req.username,
+        "sessions": req.sessions or [],
+        "activeId": req.activeId,
+    }
     try:
         if not (database_id and collection_id):
-            raise HTTPException(status_code=500, detail="APPWRITE_DATABASE_ID or APPWRITE_COLLECTION_ID not set")
+            raise HTTPException(
+                status_code=500,
+                detail="APPWRITE_DATABASE_ID or APPWRITE_COLLECTION_ID not set",
+            )
         _ensure_schema(db, database_id, collection_id)
         # Find existing by username
-        res = db.list_documents(database_id, collection_id, [Query.equal("username", req.username)])
+        res = db.list_documents(
+            database_id, collection_id, [Query.equal("username", req.username)]
+        )
         if res.get("total", 0) > 0:
             doc = res["documents"][0]
             updated = db.update_document(database_id, collection_id, doc["$id"], data)
@@ -109,8 +135,11 @@ async def get_user(username: str):
     collection_id = os.environ.get("APPWRITE_COLLECTION_ID", "")
     db = _db()
     from appwrite.query import Query
+
     try:
-        res = db.list_documents(database_id, collection_id, [Query.equal("username", username)])
+        res = db.list_documents(
+            database_id, collection_id, [Query.equal("username", username)]
+        )
         if res.get("total", 0) == 0:
             return {"exists": False}
         doc = res["documents"][0]
@@ -127,7 +156,9 @@ async def debug():
     endpoint = os.environ.get("APPWRITE_ENDPOINT", "")
     info = {
         "endpoint": endpoint,
-        "projectLooksLikeId": bool(project and (project[0].isdigit() or len(project) > 12)),
+        "projectLooksLikeId": bool(
+            project and (project[0].isdigit() or len(project) > 12)
+        ),
         "projectValue": project,
         "databaseId": database_id,
         "collectionId": collection_id,
@@ -136,8 +167,10 @@ async def debug():
         db = _db()
         _ensure_schema(db, database_id, collection_id)
         from appwrite.query import Query
+
         res = db.list_documents(database_id, collection_id, [Query.limit(1)])
         info.update({"list_ok": True, "documents_total": res.get("total", 0)})
     except Exception as e:
         info.update({"list_ok": False, "error": str(e)})
     return info
+

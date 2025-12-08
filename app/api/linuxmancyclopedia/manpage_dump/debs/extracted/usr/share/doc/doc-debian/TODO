@@ -1,0 +1,10 @@
+
+  * FIXME update
+     debian/doc-debian.doc-base.debian-constitution-text
+     debian/doc-debian.doc-base.debian-mailing-lists
+     debian/doc-debian.doc-base.debian-manifesto
+     debian/doc-debian.doc-base.debian-reporting-bugs
+     debian/doc-debian.doc-base.debian-social-contract
+    : new versions of documents TODO
+  * FIXME update d/copyright: typos, "Debian GNU/Linux"
+

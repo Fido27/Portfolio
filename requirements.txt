@@ -27,3 +27,8 @@ ollama==0.5.3
 appwrite==12.0.0
 duckduckgo-search==6.3.7
 requests==2.32.3
+httpx==0.27.2
+qdrant-client==1.9.2
+sentence-transformers==3.0.1
+tqdm==4.66.5
+xformers

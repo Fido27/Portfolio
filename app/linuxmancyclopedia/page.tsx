@@ -99,8 +99,154 @@
 // 		</Dropdown>
 //     );
 // }
+'use client';
+
+import { FormEvent, useCallback, useEffect, useRef, useState } from "react";
+
+const API_ENDPOINT = process.env.NEXT_PUBLIC_LINUX_API_URL ?? "/api/v1/explain";
+
+function useExplainCommand() {
+	const [commandInput, setCommandInput] = useState("");
+	const [aiResponse, setAiResponse] = useState("");
+	const [dangerWarning, setDangerWarning] = useState("");
+	const [errorMessage, setErrorMessage] = useState("");
+	const [isLoading, setIsLoading] = useState(false);
+	const abortRef = useRef<AbortController | null>(null);
+
+	useEffect(() => {
+		return () => {
+			abortRef.current?.abort();
+		};
+	}, []);
+
+	const processEvent = useCallback((rawEvent: string) => {
+		const lines = rawEvent.split(/\r?\n/).filter((line) => line.trim() !== "");
+		if (!lines.length) {
+			return false;
+		}
+
+		let eventType = "message";
+		const dataLines: string[] = [];
+
+		for (const line of lines) {
+			if (line.startsWith("event:")) {
+				eventType = line.replace("event:", "").trim();
+			} else if (line.startsWith("data:")) {
+				dataLines.push(line.replace("data:", "").trim());
+			}
+		}
+
+		const payload = dataLines.join("\n");
+		switch (eventType) {
+			case "warning":
+				if (payload) setDangerWarning(payload);
+				break;
+			case "message":
+				if (payload) setAiResponse((prev) => prev + payload);
+				break;
+			case "done":
+				return true;
+			default:
+				if (payload) setAiResponse((prev) => prev + payload);
+		}
+		return false;
+	}, []);
+
+	const explain = useCallback(
+		async (event?: FormEvent<HTMLFormElement>) => {
+			event?.preventDefault();
+			if (!commandInput.trim()) {
+				setErrorMessage("Please enter a Linux command to explain.");
+				return;
+			}
+
+			setIsLoading(true);
+			setAiResponse("");
+			setDangerWarning("");
+			setErrorMessage("");
+			abortRef.current?.abort();
+			const controller = new AbortController();
+			abortRef.current = controller;
+
+			try {
+				const response = await fetch(API_ENDPOINT, {
+					method: "POST",
+					headers: {
+						"Content-Type": "application/json",
+						Accept: "text/event-stream",
+					},
+					body: JSON.stringify({ command: commandInput }),
+					signal: controller.signal,
+				});
+
+				if (!response.ok || !response.body) {
+					const errorText = await response.text();
+					throw new Error(errorText || "Failed to fetch command explanation.");
+				}
+
+				const reader = response.body.getReader();
+				const decoder = new TextDecoder();
+				let buffer = "";
+				let doneStreaming = false;
+
+				while (!doneStreaming) {
+					const { value, done } = await reader.read();
+					if (value) {
+						buffer += decoder.decode(value, { stream: !done });
+					}
+
+					let boundary = buffer.indexOf("\n\n");
+					while (boundary !== -1) {
+						const rawEvent = buffer.slice(0, boundary);
+						buffer = buffer.slice(boundary + 2);
+						if (rawEvent.trim() && processEvent(rawEvent)) {
+							doneStreaming = true;
+							break;
+						}
+						boundary = buffer.indexOf("\n\n");
+					}
+
+					if (done) {
+						break;
+					}
+				}
+			} catch (error) {
+				if ((error as Error).name === "AbortError") {
+					return;
+				}
+				const message =
+					error instanceof Error ? error.message : "Unexpected error while explaining command.";
+				setErrorMessage(message);
+			} finally {
+				setIsLoading(false);
+				abortRef.current = null;
+			}
+		},
+		[commandInput, processEvent]
+	);
+
+	return {
+		commandInput,
+		setCommandInput,
+		aiResponse,
+		dangerWarning,
+		errorMessage,
+		isLoading,
+		explain,
+	};
+}
 
 export default function page() {
+	const {
+		commandInput,
+		setCommandInput,
+		aiResponse,
+		dangerWarning,
+		errorMessage,
+		isLoading,
+		explain,
+	} = useExplainCommand();
+
     return (
         <div>
 			<div className="h-screen w-full">
@@ -111,7 +257,35 @@ export default function page() {
 
 				<div className="m-16">This command was written by "Author"</div>
 
-				<div className="m-16 grid grid-cols-3 gap-2 text-6xl text-center font-mono font-semibold">
+				<div className="">
+						<form className="space-y-2" onSubmit={explain}>
+							<label htmlFor="linux-command" className="text-sm font-semibold text-gray-200">
+								Command to explain
+							</label>
+							<input
+								id="linux-command"
+								type="text"
+								value={commandInput}
+								onChange={(event) => setCommandInput(event.target.value)}
+								placeholder="e.g., cat -n /var/log/syslog"
+								className="w-full p-2 border border-gray-300 rounded-md text-white"
+							/>
+							<div className="flex items-center gap-3">
+								<button
+									type="submit"
+									className="bg-blue-500 text-white p-2 rounded-md disabled:opacity-50 disabled:cursor-not-allowed"
+									disabled={isLoading}
+								>
+									{isLoading ? "Summoning Linux mentor..." : "Submit"}
+								</button>
+								{errorMessage && <span className="text-red-400 text-sm">{errorMessage}</span>}
+							</div>
+						</form>
+					</div>
+
+				{/* ### Need to use this later. Main UI!!! */}
+
+				{/* <div className="m-16 grid grid-cols-3 gap-2 text-6xl text-center font-mono font-semibold">
 					<div className="row-start-1 col-start-1">
 							command
 					</div>
@@ -121,33 +295,28 @@ export default function page() {
 					<div className="row-start-3 col-span-3 justify-self-end">
 							[file(s) or params]
 					</div>
-				</div>
+				</div> */}
+
+
+                        {/* {AILoad()} */}
 
 				<div className="flex m-24">
 					<div id="flagsDesc" className="basis-1/2 ml-8">
 						Message here / id=flagsDesc
 					</div>
-					<div id="llama" className="basis-1/2 ml-8 overflow-scroll overflow-clip ">
-						AI generated here / id=llama
-						The `cat` command is a fundamental tool in Linux for concatenating and manipulating text files. The `-n` option specifies that the command should number its output.
-
-When you run the command `cat -n`, it reads the contents of one or more files (or standard input if no files are specified) and prints them to the console, with each line numbered starting from 1.
-
-Here's a breakdown of what this command does:
-
-* `cat`: This is the command name, which stands for "concatenate" or "copy and tack". It's used to display the contents of one or more files.
-* `-n`: This option tells `cat` to number its output. Each line will be prefixed with a sequential number, starting from 1.
-
-When you run this command, it will:
-
-1. Read the contents of each file specified (or standard input if no files are specified).
-2. Print each line of the file(s) to the console.
-3. Prefix each line with a sequential number, starting from 1.
-
-This can be useful for quickly reviewing the contents of a text file or for generating a numbered list of lines in a file. For example, you might use this command to review the output of another command or to generate a list of lines in a log file.
-
-Keep in mind that `cat` is not limited to just printing files; it can also be used to redirect the output of other commands to a new file. For example, you could use `grep -n pattern file.txt` to search for a specific pattern in a file and number the matching lines.
-						{/* {AILoad()} */}
+					<div id="llama" className="basis-1/2 ml-8 overflow-y-auto rounded border border-gray-700 p-4 bg-black/40">
+						{dangerWarning && (
+							<div
+								className="mb-4"
+								dangerouslySetInnerHTML={{ __html: dangerWarning }}
+							/>
+						)}
+						<div className="whitespace-pre-wrap text-sm leading-relaxed font-mono">
+							{aiResponse
+								|| (isLoading
+									? "Generating explanation..."
+									: "AI generated explanations will appear here.")}
+						</div>
 					</div>
 				</div>
 			</div>
