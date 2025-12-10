@@ -36,6 +36,17 @@ APPWRITE_COLLECTION_ID=
 NEXT_PUBLIC_API_BASE=http://localhost:8000
 ```
 
+### Twitch stats page
+
+Add the Twitch Client Credentials flow details to `.env.local` so the `/twitch`
+dashboard can talk to the official API:
+
+```
+TWITCH_CLIENT_ID=
+TWITCH_CLIENT_SECRET=
+TWITCH_CHANNEL_LOGIN=
+```
+
 2) Python server (one-time):
 
 ```

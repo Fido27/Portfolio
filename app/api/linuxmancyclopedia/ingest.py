@@ -9,12 +9,12 @@ import os
 import unicodedata
 import uuid
 from collections import defaultdict
+from dotenv import load_dotenv
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Dict, Iterator, List
 
 import re
-
 from qdrant_client import QdrantClient
 from qdrant_client.http import exceptions as qdrant_exceptions
 from qdrant_client.http import models as qmodels
@@ -79,6 +79,7 @@ SECTION_RE = re.compile(r"^\.(?:SH|Ss)\s+\"?([^\"\n]+)\"?.*$", re.IGNORECASE)
 FORMATTING_MACRO_RE = re.compile(r"^\.(?:[A-Z]{1,2})(?:\s+.*)?$")
 MAN_SECTION_SUFFIXES = {f".{idx}" for idx in range(1, 10)}
 
+load_dotenv()
 
 @dataclass
 class ManRecord:
@@ -393,44 +394,29 @@ def ensure_collection(client: QdrantClient, collection: str, dim: int) -> None:
     )
 
 
-def embed_documents(
+def embed_and_upsert(
     model: SentenceTransformer,
+    client: QdrantClient,
+    collection: str,
     documents: List[CommandDocument],
     batch_size: int,
-) -> List[List[float]]:
-    vectors: List[List[float]] = []
+) -> None:
+    """Embed and upsert in streaming batches to keep memory usage low."""
     iterator = range(0, len(documents), batch_size)
-    for start in tqdm(iterator, desc="Embedding", unit="batch"):
+    for start in tqdm(iterator, desc="Embedding+Upserting", unit="batch"):
         batch = documents[start : start + batch_size]
         embeddings = model.encode(
             [doc.text for doc in batch],
             normalize_embeddings=True,
             show_progress_bar=False,
         )
-        for vector in embeddings:
-            vectors.append(vector.tolist())
-    return vectors
-
-
-def upsert_documents(
-    client: QdrantClient,
-    collection: str,
-    documents: List[CommandDocument],
-    vectors: List[List[float]],
-    batch_size: int,
-) -> None:
-    total = len(documents)
-    for start in tqdm(range(0, total, batch_size), desc="Upserting", unit="batch"):
-        end = start + batch_size
-        batch_docs = documents[start:end]
-        batch_vectors = vectors[start:end]
         points = [
             qmodels.PointStruct(
                 id=str(uuid.uuid5(UUID_NAMESPACE, doc.command)),
-                vector=vector,
+                vector=vector.tolist(),
                 payload=doc.payload(),
             )
-            for doc, vector in zip(batch_docs, batch_vectors, strict=False)
+            for doc, vector in zip(batch, embeddings, strict=False)
         ]
         client.upsert(collection_name=collection, wait=True, points=points)
 
@@ -496,8 +482,7 @@ def main() -> None:
     client = build_qdrant_client(args)
     ensure_collection(client, args.collection, vector_dim)
 
-    vectors = embed_documents(model, documents, args.batch_size)
-    upsert_documents(client, args.collection, documents, vectors, args.batch_size)
+    embed_and_upsert(model, client, args.collection, documents, args.batch_size)
 
     print(f"Ingestion complete. {len(documents)} documents upserted into '{args.collection}'.")
 
