@@ -32,3 +32,4 @@ qdrant-client==1.9.2
 sentence-transformers==3.0.1
 tqdm==4.66.5
 xformers
+dotenv

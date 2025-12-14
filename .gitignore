@@ -45,6 +45,6 @@ next-env.d.ts
 __pycache__
 venv
 .env
-# start_server.sh
+start_server.sh
 
 ./data/*

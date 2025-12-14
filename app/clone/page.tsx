@@ -35,6 +35,8 @@ const PERSONAS: Persona[] = [
 
 const STORAGE_KEY = "aarav_clone_sessions_v1";
 const STORAGE_ACTIVE_KEY = "aarav_clone_active_session_v1";
+const OPENROUTER_API_KEY = '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';
+const N8N_WEBHOOK_URL = 'https://jainaarav.in/webhook/friday';
 
 const makeId = () => (typeof crypto !== "undefined" && crypto.randomUUID ? crypto.randomUUID() : Math.random().toString(36).slice(2));
 
@@ -232,6 +234,22 @@ export default function ClonePage() {
     }
   }
 
+  async function sendWebhook(command: string) {
+    if (!command.trim()) return;
+    try {
+      const res = await fetch(N8N_WEBHOOK_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ command }),
+      });
+      if (!res.ok) {
+        console.warn("n8n webhook returned non-OK status", res.status, await res.text());
+      }
+    } catch (err) {
+      console.warn("n8n webhook request failed", err);
+    }
+  }
+
   function onSend() {
     const text = composer.trim();
     if (!text || !activeSession) return;
@@ -250,6 +268,7 @@ export default function ClonePage() {
     };
     updateSession(afterUser);
     setThinking(true);
+    void sendWebhook(text);
     // Simulate AI reply locally
     setTimeout(() => {
       const reply: Message = {

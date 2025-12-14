@@ -476,7 +476,17 @@ def main() -> None:
     print(f"Prepared {len(documents)} merged command documents.")
 
     print(f"Loading embedding model '{MODEL_NAME}' on device {args.device} ...")
-    model = SentenceTransformer(MODEL_NAME, device=args.device, trust_remote_code=True)
+    config_kwargs = (
+        {"use_memory_efficient_attention": False, "attn_implementation": "sdpa"}
+        if args.device == "cpu"
+        else None
+    )
+    model = SentenceTransformer(
+        MODEL_NAME,
+        device=args.device,
+        trust_remote_code=True,
+        config_kwargs=config_kwargs,
+    )
     vector_dim = model.get_sentence_embedding_dimension()
 
     client = build_qdrant_client(args)
