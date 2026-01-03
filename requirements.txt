@@ -1,35 +1,134 @@
-annotated-types==0.7.0
-anyio==4.10.0
-click==8.2.1
-fastapi==0.116.1
+# =============================================================================
+# FIDO AI - Python Dependencies
+# =============================================================================
+
+# -----------------------------------------------------------------------------
+# Core Web Framework (Phase 0 - ACTIVE)
+# -----------------------------------------------------------------------------
+fastapi==0.123.10
+uvicorn[standard]==0.35.0
 gunicorn==23.0.0
-h11==0.16.0
-httptools==0.6.4
-idna==3.10
-numpy==2.3.2
-packaging==25.0
-pandas==2.3.2
-pydantic==2.11.7
-python-dateutil==2.9.0.post0
 python-dotenv==1.1.1
-pytz==2025.2
-PyYAML==6.0.2
-six==1.17.0
-sniffio==1.3.1
-starlette==0.47.3
-typing_extensions==4.15.0
-tzdata==2025.2
-uvicorn==0.35.0
-uvloop==0.21.0
-watchfiles==1.1.0
+pydantic==2.11.7
+pydantic-settings==2.7.0
+
+# -----------------------------------------------------------------------------
+# HTTP & Networking (Phase 0 - ACTIVE)
+# -----------------------------------------------------------------------------
+httpx==0.28.1
+requests==2.32.5
 websockets==15.0.1
+
+# -----------------------------------------------------------------------------
+# AI & LLM (Phase 0 - ACTIVE)
+# -----------------------------------------------------------------------------
+google-adk==1.21.0
+google-generativeai==0.8.0
 ollama==0.5.3
+
+# -----------------------------------------------------------------------------
+# Database & Storage (Phase 0 - ACTIVE)
+# -----------------------------------------------------------------------------
 appwrite==12.0.0
-duckduckgo-search==6.3.7
-requests==2.32.3
-httpx==0.27.2
+
+# -----------------------------------------------------------------------------
+# Memory & RAG System (Phase 1 - READY)
+# -----------------------------------------------------------------------------
 qdrant-client==1.9.2
 sentence-transformers==3.0.1
+torch>=2.0.0
+transformers>=4.30.0
+
+# -----------------------------------------------------------------------------
+# Data Processing (General)
+# -----------------------------------------------------------------------------
+numpy==2.3.2
+pandas==2.3.2
 tqdm==4.66.5
-xformers
-dotenv
+
+# -----------------------------------------------------------------------------
+# Voice & Audio (Phase 2 - Future)
+# -----------------------------------------------------------------------------
+# Uncomment when implementing Phase 2:
+# pvporcupine==3.0.2
+# SpeechRecognition==3.10.4
+# pyttsx3==2.90
+# pyaudio==0.2.14
+
+# -----------------------------------------------------------------------------
+# Computer Vision & Desktop Control (Phase 3-4 - Future)
+# -----------------------------------------------------------------------------
+# Uncomment when implementing Phase 3-4:
+# pillow==10.4.0
+# opencv-python==4.10.0.84
+# mss==10.0.0
+# pytesseract==0.3.13
+# pyautogui==0.9.54
+# pygetwindow==0.0.9
+# psutil==6.1.0
+
+# -----------------------------------------------------------------------------
+# Twitch Integration (Phase 6 - Future)
+# -----------------------------------------------------------------------------
+# Uncomment when implementing Phase 6:
+# twitchio==2.9.1
+# obs-websocket-py==1.0.0
+
+# -----------------------------------------------------------------------------
+# Utilities
+# -----------------------------------------------------------------------------
+python-dateutil==2.9.0.post0
+PyYAML==6.0.2
+click==8.2.1
+
+# -----------------------------------------------------------------------------
+# Type Hints & Standards
+# -----------------------------------------------------------------------------
+typing_extensions==4.15.0
+annotated-types==0.7.0
+
+# -----------------------------------------------------------------------------
+# ASGI Server Dependencies
+# -----------------------------------------------------------------------------
+h11==0.16.0
+httptools==0.6.4
+uvloop==0.21.0
+watchfiles==1.1.0
+
+# -----------------------------------------------------------------------------
+# Low-level Dependencies
+# -----------------------------------------------------------------------------
+anyio==4.10.0
+sniffio==1.3.1
+starlette==0.50.0
+idna==3.10
+packaging==25.0
+pytz==2025.2
+tzdata==2025.2
+six==1.17.0
+
+# =============================================================================
+# Installation Instructions
+# =============================================================================
+#
+# Install all current dependencies:
+#   pip install -r requirements.txt
+#
+# For Phase 1 (Memory/RAG):
+#   All dependencies already included! Just install and start building.
+#
+# For Phase 2 (Voice):
+#   Uncomment the "Voice & Audio" section, then:
+#   pip install -r requirements.txt
+#
+# For Phase 3-4 (Vision/Desktop):
+#   Uncomment the "Computer Vision" section, then:
+#   pip install -r requirements.txt
+#   brew install tesseract  # macOS
+#   sudo apt-get install tesseract-ocr  # Linux
+#
+# For Phase 6 (Twitch):
+#   Uncomment the "Twitch Integration" section, then:
+#   pip install -r requirements.txt
+#
+# =============================================================================
