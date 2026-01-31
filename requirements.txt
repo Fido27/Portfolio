@@ -34,7 +34,7 @@ appwrite==12.0.0
 # -----------------------------------------------------------------------------
 # Memory & RAG System (Phase 1 - READY)
 # -----------------------------------------------------------------------------
-qdrant-client==1.9.2
+qdrant-client==1.16.2
 sentence-transformers==3.0.1
 torch>=2.0.0
 transformers>=4.30.0
@@ -56,16 +56,17 @@ tqdm==4.66.5
 # pyaudio==0.2.14
 
 # -----------------------------------------------------------------------------
-# Computer Vision & Desktop Control (Phase 3-4 - Future)
+# Computer Vision & Desktop Control (Phase 4 - ACTIVE)
 # -----------------------------------------------------------------------------
-# Uncomment when implementing Phase 3-4:
-# pillow==10.4.0
+pillow==11.0.0
+mss==10.1.0
+pyautogui==0.9.54
+# Optional (uncomment if needed):
 # opencv-python==4.10.0.84
-# mss==10.0.0
 # pytesseract==0.3.13
-# pyautogui==0.9.54
 # pygetwindow==0.0.9
 # psutil==6.1.0
+
 
 # -----------------------------------------------------------------------------
 # Twitch Integration (Phase 6 - Future)
@@ -80,6 +81,12 @@ tqdm==4.66.5
 python-dateutil==2.9.0.post0
 PyYAML==6.0.2
 click==8.2.1
+
+# -----------------------------------------------------------------------------
+# Task Scheduling (Phase 2 - Time-Based Scheduler)
+# -----------------------------------------------------------------------------
+APScheduler==3.10.4
+dateparser==1.2.0
 
 # -----------------------------------------------------------------------------
 # Type Hints & Standards

@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@google/adk": "^0.2.1",
     "@heroui/card": "latest",
     "@heroui/react": "latest",
     "@radix-ui/react-label": "latest",
@@ -26,6 +27,9 @@
     "phaser3-rex-plugins": "^1.80.16",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
+    "react-just-parallax": "^3.1.16",
+    "react-markdown": "^10.0.0",
+    "remark-gfm": "^4.0.0",
     "tailwind-merge": "^3.3.1"
   },
   "devDependencies": {

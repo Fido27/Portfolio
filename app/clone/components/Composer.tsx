@@ -4,13 +4,11 @@ import { cn } from "@/lib/utils/cn";
 
 export function Composer(props: {
   composer: string;
-  thinking: boolean;
   composerRef: React.RefObject<HTMLTextAreaElement | null>;
   onChange: (next: string) => void;
   onSend: () => void;
-  onInput: () => void;
 }) {
-  const { composer, thinking, composerRef, onChange, onSend, onInput } = props;
+  const { composer, composerRef, onChange, onSend } = props;
 
   return (
     <div className="border-t border-white/10">
@@ -23,7 +21,6 @@ export function Composer(props: {
               placeholder="Talk to me…"
               value={composer}
               onChange={(e) => onChange(e.target.value)}
-              onInput={onInput}
               onKeyDown={(e) => {
                 if ((e.metaKey || e.ctrlKey) && e.key === "Enter") onSend();
               }}
@@ -31,10 +28,10 @@ export function Composer(props: {
           </div>
           <button
             onClick={() => onSend()}
-            disabled={!composer.trim() || thinking}
+            disabled={!composer.trim()}
             className={cn(
               "h-10 px-4 rounded-lg border bg-white/10 border-white/15 hover:bg-white/20 transition",
-              (!composer.trim() || thinking) && "opacity-50 cursor-not-allowed"
+              !composer.trim() && "opacity-50 cursor-not-allowed"
             )}
           >
             Send
@@ -45,4 +42,3 @@ export function Composer(props: {
     </div>
   );
 }
-

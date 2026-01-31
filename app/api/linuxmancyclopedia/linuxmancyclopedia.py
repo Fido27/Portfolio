@@ -23,7 +23,7 @@ async def llama_calls(cmd , flags):
     return res
 
 @api.get("/cat")
-async def get_man_page_for(get_man_page_for: cmd):
+async def get_man_page_for(get_man_page_for: str):
     return {
         "name": "neko",
         "desc": "concats files and throws them at stdout",
