@@ -49,8 +49,8 @@ export default function WorldClockPage() {
 
 	// Load columns from localStorage and prepare infinite columns
 	const [columns, setColumns] = useState<ColumnConfig[]>(defaultColumns);
-	const [infiniteColumns, setInfiniteColumns] = useState<EnhancedInfiniteColumn[]>(() => {
-		const generator = InfiniteColumnGenerator.getInstance();
+	const [infiniteColumns] = useState<EnhancedInfiniteColumn[]>(() => {
+		InfiniteColumnGenerator.getInstance();
 		const baseColumns = defaultColumns
 			.filter(col => col.visible)
 			.map(col => ({

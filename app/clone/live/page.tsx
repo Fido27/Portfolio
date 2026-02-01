@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef, useEffect, useCallback } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import Image from 'next/image';
 
 /**
@@ -49,6 +49,7 @@ export default function VoicePage() {
             }
             disconnect();
         };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     // Connect to WebSocket
@@ -113,8 +114,8 @@ export default function VoicePage() {
                 }, delay);
             };
 
-        } catch (err: any) {
-            setConnectionError(`Connection failed: ${err.message}`);
+        } catch (err) {
+            setConnectionError(`Connection failed: ${err instanceof Error ? err.message : 'Unknown error'}`);
         }
     }
 
@@ -131,7 +132,7 @@ export default function VoicePage() {
     }
 
     // Handle messages from server
-    function handleServerMessage(msg: any) {
+    function handleServerMessage(msg: { type: string; session_id?: string; data?: string; text?: string; message?: string }) {
         switch (msg.type) {
             case 'connected':
                 setIsConnected(true);
@@ -141,6 +142,7 @@ export default function VoicePage() {
 
             case 'audio':
                 // Decode and queue audio for playback
+                if (!msg.data) break;
                 const audioData = base64ToFloat32(msg.data);
                 playAudioChunk(audioData);
 
@@ -150,7 +152,7 @@ export default function VoicePage() {
                 break;
 
             case 'error':
-                setConnectionError(msg.message);
+                setConnectionError(msg.message || 'Unknown error');
                 break;
 
             case 'pong':
@@ -306,8 +308,8 @@ export default function VoicePage() {
             setIsListening(true);
             setConnectionError('');
 
-        } catch (err: any) {
-            setConnectionError(`Microphone error: ${err.message}`);
+        } catch (err) {
+            setConnectionError(`Microphone error: ${err instanceof Error ? err.message : 'Unknown error'}`);
             console.error(err);
         }
     }

@@ -1,7 +1,11 @@
 'use client';
 import dynamic from 'next/dynamic';
 
-const HallwaysGame = dynamic(() => import('./game').then(m => m.default), { ssr: false });
+// Use the new refactored version (game-v2)
+const HallwaysGame = dynamic(() => import('./game-v2').then(m => m.default), { ssr: false });
+
+// Keep old version available for reference/fallback
+// const HallwaysGameOld = dynamic(() => import('./game').then(m => m.default), { ssr: false });
 
 export default function GamePage() {
   return (

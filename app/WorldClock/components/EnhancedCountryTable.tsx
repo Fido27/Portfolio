@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useRef, useEffect, useState, useMemo } from "react";
-import type { Country, SortConfig, CountryMetrics } from "../hooks/useCountries";
+import type { Country, SortConfig } from "../hooks/useCountries";
 import type { EnhancedColumnConfig } from "../lib/columnConfig";
 import Sparkline from "./Sparkline";
 
@@ -21,16 +21,17 @@ type EnhancedCountryTableProps = {
 
 const ROW_HEIGHT = 48;
 const OVERSCAN = 5;
-const MIN_COLUMN_WIDTH = 80;
-const MAX_COLUMN_WIDTH = 300;
+// Column width constraints (for reference)
+// const MIN_COLUMN_WIDTH = 80;
+// const MAX_COLUMN_WIDTH = 300;
 
 // Enhanced formatters for different data types
-function formatValue(value: any, dataType: string): string {
+function formatValue(value: unknown, dataType: string): string {
 	if (value == null || value === "") return "—";
 	
 	switch (dataType) {
-		case "currency":
-			const num = typeof value === "string" ? parseFloat(value) : value;
+		case "currency": {
+			const num = typeof value === "string" ? parseFloat(value) : typeof value === "number" ? value : NaN;
 			if (isNaN(num)) return "—";
 			return new Intl.NumberFormat("en-US", {
 				style: "currency",
@@ -38,16 +39,19 @@ function formatValue(value: any, dataType: string): string {
 				minimumFractionDigits: 0,
 				maximumFractionDigits: 0,
 			}).format(num);
+		}
 			
-		case "number":
-			const numVal = typeof value === "string" ? parseFloat(value) : value;
+		case "number": {
+			const numVal = typeof value === "string" ? parseFloat(value) : typeof value === "number" ? value : NaN;
 			if (isNaN(numVal)) return "—";
 			return numVal.toLocaleString();
+		}
 			
-		case "rank":
-			const rankVal = typeof value === "string" ? parseInt(value) : value;
+		case "rank": {
+			const rankVal = typeof value === "string" ? parseInt(value) : typeof value === "number" ? value : NaN;
 			if (isNaN(rankVal)) return "—";
 			return `#${rankVal}`;
+		}
 			
 		default:
 			return String(value);
@@ -56,7 +60,7 @@ function formatValue(value: any, dataType: string): string {
 
 // Column renderers for different data types
 const createColumnRenderer = (column: EnhancedColumnConfig) => {
-	const { key, dataType, width } = column;
+	const { key, dataType } = column;
 	
 	switch (dataType) {
 		case "flag":
@@ -91,7 +95,7 @@ const createColumnRenderer = (column: EnhancedColumnConfig) => {
 		case "currency":
 		case "rank":
 			return (country: Country) => {
-				const value = country[key as keyof Country] || country.metrics?.[key as keyof CountryMetrics];
+				const value = country[key as keyof Country];
 				return (
 					<span className="font-mono text-right block w-full">
 						{formatValue(value, dataType)}
@@ -308,7 +312,6 @@ export default function EnhancedCountryTable({
 				{fixedColumns.map((col, i) => {
 					const isSorted = sort.key === col.key;
 					const stickyLeft = getFixedLeft(i);
-					const renderer = createColumnRenderer(col);
 
 					return (
 						<div
@@ -347,7 +350,6 @@ export default function EnhancedCountryTable({
 				>
 					{visibleScrollableColumns.map((col) => {
 						const isSorted = sort.key === col.key;
-						const renderer = createColumnRenderer(col);
 
 						return (
 							<div

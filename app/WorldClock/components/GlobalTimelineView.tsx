@@ -1,13 +1,13 @@
 "use client";
 
 import { useRef, useState, useEffect, useCallback } from "react";
-import { motion, useSpring, useTransform, useMotionValue } from "motion/react";
+import { motion, useSpring, useMotionValue } from "motion/react";
 
 interface GlobalTimelineViewProps {
     onBack: () => void;
 }
 
-export default function GlobalTimelineView({ onBack }: GlobalTimelineViewProps) {
+export default function GlobalTimelineView({ }: GlobalTimelineViewProps) {
     const containerRef = useRef<HTMLDivElement>(null);
     const [isDragging, setIsDragging] = useState(false);
 
@@ -80,6 +80,7 @@ export default function GlobalTimelineView({ onBack }: GlobalTimelineViewProps) 
                 container.removeEventListener('wheel', handleWheel);
             }
         };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [handleMouseMove]);
 
     return (

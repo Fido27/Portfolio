@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState } from "react";
 import type { Country } from "../hooks/useCountries";
 
 type CountryDetailViewProps = {
@@ -9,7 +9,7 @@ type CountryDetailViewProps = {
 	onTimelineView: () => void;
 };
 
-export default function CountryDetailView({ country, onBack, onTimelineView }: CountryDetailViewProps) {
+export default function CountryDetailView({ country, onTimelineView }: CountryDetailViewProps) {
 	const [activeTab, setActiveTab] = useState<'overview' | 'economy' | 'culture' | 'politics' | 'geography'>('overview');
 
 	const renderOverview = () => (
@@ -60,10 +60,10 @@ export default function CountryDetailView({ country, onBack, onTimelineView }: C
 					</div>
 				</div>
 
-				{country.famous_for && (
+				{country.famous_food && (
 					<div>
-						<h3 className="font-semibold mb-2">Famous For</h3>
-						<p className="text-sm text-base-content/80">{country.famous_for}</p>
+						<h3 className="font-semibold mb-2">Famous Food</h3>
+						<p className="text-sm text-base-content/80">{country.famous_food}</p>
 					</div>
 				)}
 
@@ -169,7 +169,7 @@ export default function CountryDetailView({ country, onBack, onTimelineView }: C
 			{country.national_anthem && (
 				<div>
 					<h3 className="font-semibold mb-2">National Anthem</h3>
-					<p className="text-sm text-base-content/80 italic">"{country.national_anthem}"</p>
+					<p className="text-sm text-base-content/80 italic">&quot;{country.national_anthem}&quot;</p>
 				</div>
 			)}
 		</div>
@@ -322,7 +322,7 @@ export default function CountryDetailView({ country, onBack, onTimelineView }: C
 								? 'bg-base-100 border-b-2 border-primary text-primary'
 								: 'hover:bg-base-100/50'
 							}`}
-						onClick={() => setActiveTab(tab.key as any)}
+						onClick={() => setActiveTab(tab.key as typeof activeTab)}
 					>
 						{tab.label}
 					</button>

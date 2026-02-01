@@ -1,5 +1,4 @@
 'use client'
-import { MouseParallax } from "react-just-parallax";
 import Image from "next/image"
 import styles from '../styles.module.css'
 import { projectCard } from "./card";

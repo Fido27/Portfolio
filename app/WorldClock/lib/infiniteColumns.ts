@@ -183,7 +183,7 @@ export class InfiniteColumnGenerator {
 					key: `${selectedColumn.key}_${startIndex + i}`,
 					originalKey: selectedColumn.key,
 					position: startIndex + i,
-				} as any);
+				} as EnhancedInfiniteColumn);
 
 				this.usedColumns.add(selectedColumn.key);
 			}

@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import type { EnhancedColumnConfig, ColumnCategory } from "../hooks/useCountries";
-import { DEFAULT_COLUMNS, COLUMN_CATEGORIES, getColumnsByCategory } from "../lib/columnConfig";
+import { DEFAULT_COLUMNS, COLUMN_CATEGORIES } from "../lib/columnConfig";
 
 type EnhancedColumnSelectorProps = {
 	columns: EnhancedColumnConfig[];

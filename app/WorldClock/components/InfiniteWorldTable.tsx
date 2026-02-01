@@ -3,7 +3,7 @@
 import { useCallback, useRef, useEffect, useState, useMemo } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import type { Country, SortConfig } from "../hooks/useCountries";
-import type { EnhancedInfiniteColumn, ZoomState } from "../lib/infiniteColumns";
+import type { EnhancedInfiniteColumn } from "../lib/infiniteColumns";
 import { useZoomGestures } from "../hooks/useZoomGestures";
 import { InfiniteColumnGenerator } from "../lib/infiniteColumns";
 import CountryDetailView from "./CountryDetailView";
@@ -25,12 +25,12 @@ const LOAD_MORE_THRESHOLD = 200;
 const GENERATION_SEED_KEY = "infinite-columns-seed";
 
 // Enhanced formatters for different data types
-function formatValue(value: any, dataType: string): string {
+function formatValue(value: unknown, dataType: string): string {
 	if (value == null || value === "") return "—";
 
 	switch (dataType) {
-		case "currency":
-			const num = typeof value === "string" ? parseFloat(value) : value;
+		case "currency": {
+			const num = typeof value === "string" ? parseFloat(value) : typeof value === "number" ? value : NaN;
 			if (isNaN(num)) return "—";
 			return new Intl.NumberFormat("en-US", {
 				style: "currency",
@@ -38,16 +38,19 @@ function formatValue(value: any, dataType: string): string {
 				minimumFractionDigits: 0,
 				maximumFractionDigits: 0,
 			}).format(num);
+		}
 
-		case "number":
-			const numVal = typeof value === "string" ? parseFloat(value) : value;
+		case "number": {
+			const numVal = typeof value === "string" ? parseFloat(value) : typeof value === "number" ? value : NaN;
 			if (isNaN(numVal)) return "—";
 			return numVal.toLocaleString();
+		}
 
-		case "rank":
-			const rankVal = typeof value === "string" ? parseInt(value) : value;
+		case "rank": {
+			const rankVal = typeof value === "string" ? parseInt(value) : typeof value === "number" ? value : NaN;
 			if (isNaN(rankVal)) return "—";
 			return `#${rankVal}`;
+		}
 
 		case "boolean":
 			return value ? "✓" : "✗";
@@ -59,7 +62,7 @@ function formatValue(value: any, dataType: string): string {
 
 // Column renderers for different data types
 const createColumnRenderer = (column: EnhancedInfiniteColumn) => {
-	const { key, dataType, width } = column;
+	const { key, dataType } = column;
 
 	switch (dataType) {
 		case "flag":
@@ -87,7 +90,7 @@ const createColumnRenderer = (column: EnhancedInfiniteColumn) => {
 				);
 			}
 			return (country: Country) => {
-				const actualKey = (column as any).originalKey || key;
+				const actualKey = (column as EnhancedInfiniteColumn & { originalKey?: string }).originalKey || key;
 				return (
 					<span className="truncate">{formatValue(country[actualKey as keyof Country], dataType)}</span>
 				);
@@ -97,7 +100,7 @@ const createColumnRenderer = (column: EnhancedInfiniteColumn) => {
 		case "currency":
 		case "rank":
 			return (country: Country) => {
-				const actualKey = (column as any).originalKey || key;
+				const actualKey = (column as EnhancedInfiniteColumn & { originalKey?: string }).originalKey || key;
 				const value = country[actualKey as keyof Country] || country.indices?.[actualKey];
 				return (
 					<span className="font-mono text-right block w-full">
@@ -151,7 +154,7 @@ const createColumnRenderer = (column: EnhancedInfiniteColumn) => {
 				);
 			}
 			return (country: Country) => {
-				const actualKey = (column as any).originalKey || key;
+				const actualKey = (column as EnhancedInfiniteColumn & { originalKey?: string }).originalKey || key;
 				const value = country[actualKey as keyof Country];
 				if (Array.isArray(value)) {
 					return (
@@ -172,7 +175,7 @@ const createColumnRenderer = (column: EnhancedInfiniteColumn) => {
 
 		default:
 			return (country: Country) => {
-				const actualKey = (column as any).originalKey || key;
+				const actualKey = (column as EnhancedInfiniteColumn & { originalKey?: string }).originalKey || key;
 				return <span>{formatValue(country[actualKey as keyof Country], dataType)}</span>;
 			};
 	}
@@ -234,7 +237,7 @@ export default function InfiniteWorldTable({
 	}, [countries]);
 
 	// Zoom gestures
-	const { zoomState, setZoomLevel, resetZoom } = useZoomGestures(containerRef as any, { resolveFocus });
+	const { zoomState, setZoomLevel } = useZoomGestures(containerRef as React.RefObject<HTMLElement>, { resolveFocus });
 
 	// Generate more columns as we scroll horizontally
 	const generateMoreColumns = useCallback((scrollPosition: number) => {
@@ -329,7 +332,7 @@ export default function InfiniteWorldTable({
 	};
 
 	// Handle country click with zoom
-	const handleCountryClick = useCallback((country: Country, event: React.MouseEvent) => {
+	const handleCountryClick = useCallback((country: Country) => {
 		if (zoomState.level === 'table') {
 			setZoomLevel('detail', country.$id);
 		} else {
@@ -411,9 +414,8 @@ export default function InfiniteWorldTable({
 								style={{ minWidth: totalWidth }}
 							>
 								{visibleColumns.map((col) => {
-									const isSorted = sort.key === ((col as any).originalKey || col.key);
-									const renderer = createColumnRenderer(col);
-									const actualKey = (col as any).originalKey || col.key;
+									const actualKey = (col as EnhancedInfiniteColumn & { originalKey?: string }).originalKey || col.key;
+									const isSorted = sort.key === actualKey;
 
 									return (
 										<div
@@ -469,7 +471,7 @@ export default function InfiniteWorldTable({
 									border-b border-base-200
 								`}
 												style={{ height: ROW_HEIGHT, minWidth: totalWidth }}
-												onClick={(e) => handleCountryClick(country, e)}
+												onClick={() => handleCountryClick(country)}
 											>
 												{visibleColumns.map((col) => {
 													const renderer = createColumnRenderer(col);

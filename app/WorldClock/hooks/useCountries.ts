@@ -55,6 +55,27 @@ export type CountryFilters = {
 	search?: string;
 };
 
+export type ColumnCategory = "basic" | "economic" | "social" | "geographic" | "indices";
+
+export type EnhancedColumnConfig = {
+	key: string;
+	label: string;
+	category: ColumnCategory;
+	dataType: "text" | "number" | "currency" | "rank" | "badge" | "flag" | "sparkline";
+	width: number;
+	visible: boolean;
+	fixed?: boolean;
+	sortable?: boolean;
+	description?: string;
+};
+
+export type CountryMetrics = {
+	gdp?: number;
+	gdpPerCapita?: number;
+	unemployment?: number;
+	[key: string]: number | undefined;
+};
+
 export type SortConfig = {
 	key: keyof Country | "peace_2023" | "happiness_2023";
 	direction: "asc" | "desc";

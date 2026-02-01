@@ -23,13 +23,6 @@ function formatCompact(value: string | number | undefined): string {
 	return Intl.NumberFormat(undefined, { notation: "compact", maximumFractionDigits: 1 }).format(num);
 }
 
-function getLatestIndex(indices: Country["indices"], indexName: string): number | null {
-	if (!indices?.[indexName]) return null;
-	const years = Object.keys(indices[indexName]!).sort().reverse();
-	if (years.length === 0) return null;
-	return indices[indexName]![years[0]];
-}
-
 type ComparisonRowProps = {
 	label: string;
 	values: (string | number | React.ReactNode)[];
@@ -151,7 +144,6 @@ export default function ComparisonPanel({ countries, onRemove, onClose }: Compar
 							<tr className="border-b border-base-200">
 								<td className="py-2 px-3 text-sm text-base-content/60 font-medium">Peace Index</td>
 								{countries.map((c) => {
-									const peaceValue = getLatestIndex(c.indices, "peace");
 									return (
 										<td key={c.$id} className="py-2 px-3">
 											<div className="flex flex-col items-center gap-1">

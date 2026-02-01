@@ -1,13 +1,11 @@
 'use client'
 import Image from "next/image"
 import styles from './styles.module.css'
-import Background from "./bg"
 import Link from "next/link"
-import { useState } from "react"
 
 // Testing img mess up
 
-let colorArr = ["rgb(50,160,15)" , "rgb(50,160,15)" , "rgb(50,160,15)" , "rgb(50,160,15)" , "rgb(50,160,15)" , "rgb(50,160,15)" , "rgb(50,160,15)" , "rgb(50,160,15)" , "rgb(50,160,15)" , "rgb(50,160,15)"]
+const colorArr = ["rgb(50,160,15)" , "rgb(50,160,15)" , "rgb(50,160,15)" , "rgb(50,160,15)" , "rgb(50,160,15)" , "rgb(50,160,15)" , "rgb(50,160,15)" , "rgb(50,160,15)" , "rgb(50,160,15)" , "rgb(50,160,15)"]
 
 function randColor() {
 	const r = Math.floor(Math.random() * 256);

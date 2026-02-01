@@ -236,7 +236,7 @@ function useExplainCommand() {
 	};
 }
 
-export default function page() {
+export default function Page() {
 	const {
 		commandInput,
 		setCommandInput,
@@ -255,7 +255,7 @@ export default function page() {
 					fill = "white"
 				/> */}
 
-				<div className="m-16">This command was written by "Author"</div>
+				<div className="m-16">This command was written by &quot;Author&quot;</div>
 
 				<div className="">
 						<form className="space-y-2" onSubmit={explain}>
